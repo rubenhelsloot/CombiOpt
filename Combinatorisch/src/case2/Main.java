@@ -128,7 +128,20 @@ public class Main {
 	}
 
 	void calculateDistance() {
-		// TODO: Calculate distance array if not given
+		coordinates = arrayMap.get("COORDINATES");
+		int size = coordinates.length;
+		distance = new int[size][size];
+		
+		for (int i = 0; i < size; i++) {
+			distance[i][i] = 0;
+			for (int j = i + 1; j < size; j++) {
+				double dx = Math.pow(coordinates[i][1] - coordinates[j][1], 2.0);
+				double dy = Math.pow(coordinates[i][2] - coordinates[j][2], 2.0);
+				int value = (int) Math.floor(Math.sqrt(dx + dy));
+				distance[i][j] = distance[j][i] = value;
+			}
+		}
+		arrayMap.put("DISTANCE", distance);
 	}
 	
 	void printArray(int[][] array) {
@@ -159,3 +172,7 @@ public class Main {
 		new Main().start(args);
 	}
 }
+
+//TODO: Construct vehicle class
+//TODO: Construct depot class
+//TODO: Construct location class
