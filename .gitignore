@@ -1,4 +1,9 @@
 *.class
+*.swp
+
+.DS_Store
+/.metadata/
+/.recommenders/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
