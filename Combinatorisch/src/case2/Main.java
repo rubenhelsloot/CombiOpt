@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,16 +18,19 @@ public class Main {
 	int[][] tools, coordinates, requests, distance;
 	Map<String, Integer> map;
 	Map<String, int[][]> arrayMap;
+	PrintStream out;
 
 	Main() {
 		map = new HashMap<>();
 		arrayMap = new HashMap<>();
+		out = new PrintStream(System.out);
 	}
 
 	Main(String str) {
 		String[] s = { str };
 		map = new HashMap<>();
 		arrayMap = new HashMap<>();
+		out = new PrintStream(System.out);
 		start(s);
 	}
 
@@ -125,6 +129,15 @@ public class Main {
 
 	void calculateDistance() {
 		// TODO: Calculate distance array if not given
+	}
+	
+	void printArray(int[][] array) {
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < array[0].length; j++) {
+				out.printf(array[i][j] + "\t");
+			}
+			out.printf("\n");
+		}
 	}
 
 	void start(String[] args) {
