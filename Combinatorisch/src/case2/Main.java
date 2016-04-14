@@ -173,6 +173,6 @@ public class Main {
 	}
 }
 
-//TODO: Construct vehicle class
-//TODO: Construct depot class
-//TODO: Construct location class
+//TODO: Algorithm selection
+//TODO: Construct day class
+//TODO: Define timespan as day[]
