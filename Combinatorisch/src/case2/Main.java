@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+//import jsprit.*;
 
 public class Main {
 
@@ -19,6 +20,10 @@ public class Main {
 	Map<String, Integer> map;
 	Map<String, int[][]> arrayMap;
 	PrintStream out;
+	
+	Day[] horizon;
+	Depot depot;
+	ArrayList<Request> requestlist;
 
 	Main() {
 		map = new HashMap<>();
@@ -32,6 +37,15 @@ public class Main {
 		arrayMap = new HashMap<>();
 		out = new PrintStream(System.out);
 		start(s);
+	}
+	
+	void printArray(int[][] array) {
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < array[0].length; j++) {
+				out.printf(array[i][j] + "\t");
+			}
+			out.printf("\n");
+		}
 	}
 
 	void readFile(BufferedReader br) throws Exception {
@@ -144,12 +158,27 @@ public class Main {
 		arrayMap.put("DISTANCE", distance);
 	}
 	
-	void printArray(int[][] array) {
-		for (int i = 0; i < array.length; i++) {
-			for (int j = 0; j < array[0].length; j++) {
-				out.printf(array[i][j] + "\t");
-			}
-			out.printf("\n");
+	void setup() {
+		horizon = new Day[days];
+		for (int i = 0; i < days; i++) { horizon[i] = new Day(i); }
+		depot = new Depot(coordinates[depotCoordinate][1],
+				coordinates[depotCoordinate][2], tools, capacity, maxTripDistance);
+		requestlist = fillRequestList(requests);
+	}
+	
+	ArrayList<Request> fillRequestList(int[][] requests) {
+		ArrayList<Request> result = new ArrayList<>();
+		for (int i = 0; i < requests.length; i++) {
+			result.add(new Request(requests[i][0], requests, coordinates));
+		}
+		return result;
+	}
+	
+	void schedule() {
+		for (int i = 0; i < days; i++) {
+			horizon[i].init(requestlist);
+			int carpool = (int) Math.ceil(horizon[i].getInitialToolSpace(tools) * 1.0/capacity);
+			horizon[i].scheduleMusts(carpool);
 		}
 	}
 
@@ -166,6 +195,9 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
+		
+		setup();
+		schedule();
 	}
 
 	public static void main(String[] args) {
@@ -174,5 +206,3 @@ public class Main {
 }
 
 //TODO: Algorithm selection
-//TODO: Construct day class
-//TODO: Define timespan as day[]
