@@ -15,12 +15,12 @@ public class Main {
 
 	BufferedReader br = null;
 	FileReader fr;
-	int days, capacity, maxTripDistance, depotCoordinate, vehicleCost, vehicleDayCost, distanceCost;
+	int days, capacity, maxTripDistance, depotCoordinate, vehicleCost, vehicleDayCost, distanceCost, maxDistance;
 	int[][] tools, coordinates, requests, distance;
 	Map<String, Integer> map;
 	Map<String, int[][]> arrayMap;
 	PrintStream out;
-	
+
 	Day[] horizon;
 	Depot depot;
 	ArrayList<Request> requestlist;
@@ -38,7 +38,7 @@ public class Main {
 		out = new PrintStream(System.out);
 		start(s);
 	}
-	
+
 	void printArray(int[][] array) {
 		for (int i = 0; i < array.length; i++) {
 			for (int j = 0; j < array[0].length; j++) {
@@ -48,21 +48,31 @@ public class Main {
 		}
 	}
 
+	int maxValue(int[][] array) {
+		int result = 0;
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < array[0].length; j++) {
+				result = Math.max(result, array[i][j]);
+			}
+		}
+		return result;
+	}
+
 	void readFile(BufferedReader br) throws Exception {
 		String line;
 		ArrayList<String> al = new ArrayList<>();
 		br.readLine();
 		br.readLine();
-		
+
 		while ((line = br.readLine()) != null) {
 			if (line.length() == 0) {
 				continue;
 			}
 			al.add(line);
 		}
-		
+
 		readVariables(al);
-		
+
 		days = map.get("DAYS");
 		capacity = map.get("CAPACITY");
 		maxTripDistance = map.get("MAX_TRIP_DISTANCE");
@@ -74,6 +84,7 @@ public class Main {
 		coordinates = arrayMap.get("COORDINATES");
 		requests = arrayMap.get("REQUESTS");
 		distance = arrayMap.get("DISTANCE");
+		maxDistance = maxValue(distance);
 	}
 
 	void readVariables(ArrayList<String> al) {
@@ -145,7 +156,7 @@ public class Main {
 		coordinates = arrayMap.get("COORDINATES");
 		int size = coordinates.length;
 		distance = new int[size][size];
-		
+
 		for (int i = 0; i < size; i++) {
 			distance[i][i] = 0;
 			for (int j = i + 1; j < size; j++) {
@@ -157,15 +168,17 @@ public class Main {
 		}
 		arrayMap.put("DISTANCE", distance);
 	}
-	
+
 	void setup() {
 		horizon = new Day[days];
-		for (int i = 0; i < days; i++) { horizon[i] = new Day(i); }
-		depot = new Depot(coordinates[depotCoordinate][1],
-				coordinates[depotCoordinate][2], tools, capacity, maxTripDistance);
+		for (int i = 0; i < days; i++) {
+			horizon[i] = new Day(i);
+		}
+		depot = new Depot(coordinates[depotCoordinate][1], coordinates[depotCoordinate][2], tools, capacity,
+				maxTripDistance);
 		requestlist = fillRequestList(requests);
 	}
-	
+
 	ArrayList<Request> fillRequestList(int[][] requests) {
 		ArrayList<Request> result = new ArrayList<>();
 		for (int i = 0; i < requests.length; i++) {
@@ -173,12 +186,12 @@ public class Main {
 		}
 		return result;
 	}
-	
+
 	void schedule() {
 		for (int i = 0; i < days; i++) {
 			horizon[i].init(requestlist);
-			int carpool = (int) Math.ceil(horizon[i].getInitialToolSpace(tools) * 1.0/capacity);
-			horizon[i].scheduleMusts(carpool);
+			int carpool = (int) Math.ceil(horizon[i].getInitialToolSpace(tools) * 1.0 / capacity);
+			horizon[i].scheduleMusts(carpool, maxDistance);
 		}
 	}
 
@@ -195,7 +208,7 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
-		
+
 		setup();
 		schedule();
 	}
@@ -205,4 +218,4 @@ public class Main {
 	}
 }
 
-//TODO: Algorithm selection
+// TODO: Algorithm selection
