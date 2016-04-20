@@ -171,18 +171,18 @@ public class Main {
 
 	void setup() {
 		horizon = new Day[days];
-		for (int i = 0; i < days; i++) {
-			horizon[i] = new Day(i);
-		}
-		depot = new Depot(coordinates[depotCoordinate][1], coordinates[depotCoordinate][2], tools, capacity,
+		depot = new Depot(depotCoordinate, coordinates[depotCoordinate][1], coordinates[depotCoordinate][2], tools, capacity,
 				maxTripDistance);
+		for (int i = 0; i < days; i++) {
+			horizon[i] = new Day(i, depot);
+		}
 		requestlist = fillRequestList(requests);
 	}
 
 	ArrayList<Request> fillRequestList(int[][] requests) {
 		ArrayList<Request> result = new ArrayList<>();
 		for (int i = 0; i < requests.length; i++) {
-			result.add(new Request(requests[i][0], requests, coordinates));
+			result.add(new Request(requests[i][0], requests, coordinates, depotCoordinate));
 		}
 		return result;
 	}
@@ -191,7 +191,7 @@ public class Main {
 		for (int i = 0; i < days; i++) {
 			horizon[i].init(requestlist);
 			int carpool = (int) Math.ceil(horizon[i].getInitialToolSpace(tools) * 1.0 / capacity);
-			horizon[i].scheduleMusts(carpool, maxDistance);
+			horizon[i].scheduleMusts(carpool, maxDistance, distance, depotCoordinate);
 		}
 	}
 

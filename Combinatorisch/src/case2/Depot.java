@@ -3,16 +3,14 @@ package case2;
 import java.util.ArrayList;
 
 public class Depot {
-	int x;
-	int y;
+	Location location;
 	int maxCap;
 	int maxDist;
 	ArrayList<Tool> toolstack;
 	ArrayList<Vehicle> carpark;
 	
-	Depot(int x, int y, int[][] tools, int maxCap, int maxDist) {
-		this.x = x;
-		this.y = y;
+	Depot(int id, int x, int y, int[][] tools, int maxCap, int maxDist) {
+		location = new Location(id, x, y);
 		this.maxCap = maxCap;
 		this.maxDist = maxDist;
 		toolstack = new ArrayList<>();
