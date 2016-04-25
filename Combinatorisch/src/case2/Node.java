@@ -7,4 +7,11 @@ public class Node {
         data = d;
         next = n;
     }
+    
+    public int size() {
+    	if(next != null) {
+    		return next.size() + 1;
+    	}
+    	return 1;
+    }
 }

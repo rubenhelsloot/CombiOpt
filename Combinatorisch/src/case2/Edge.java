@@ -5,8 +5,8 @@ public class Edge {
     Location end;
     int length;
     public Edge(Location start, Location end) {
-        start = start;
-        end = end;
+        this.start = start;
+        this.end = end;
         length = start.distance(end);
     }
 }

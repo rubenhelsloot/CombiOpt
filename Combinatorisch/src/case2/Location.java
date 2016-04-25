@@ -1,5 +1,7 @@
 package case2;
 
+import java.util.ArrayList;
+
 public class Location implements Comparable {
 	int id;
 	int x;
@@ -11,7 +13,16 @@ public class Location implements Comparable {
 		this.id = id;
 		this.x = x;
 		this.y = y;
-		this.angle = Math.tan((y - dy) * 1.0/(x - dx));
+		this.angle = Math.atan2(y - dy, x - dx);
+		
+		init();
+	}
+	
+	Location(int id, int x, int y, Location d) {
+		this.id = id;
+		this.x = x;
+		this.y = y;
+		this.angle = Math.atan2(y - d.y, x - d.x);
 		
 		init();
 	}
@@ -70,4 +81,8 @@ public class Location implements Comparable {
         }
         return 0;
     }
+    
+    void print() {
+		System.out.println("(" + x + ", " + y + ") " + angle);
+	}
 }

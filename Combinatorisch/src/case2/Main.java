@@ -182,7 +182,7 @@ public class Main {
 	ArrayList<Request> fillRequestList(int[][] requests) {
 		ArrayList<Request> result = new ArrayList<>();
 		for (int i = 0; i < requests.length; i++) {
-			result.add(new Request(requests[i][0], requests, coordinates, depotCoordinate));
+			result.add(new Request(requests[i][0], requests, coordinates, depot));
 		}
 		return result;
 	}
@@ -191,7 +191,7 @@ public class Main {
 		for (int i = 0; i < days; i++) {
 			horizon[i].init(requestlist);
 			int carpool = (int) Math.ceil(horizon[i].getInitialToolSpace(tools) * 1.0 / capacity);
-			horizon[i].scheduleMusts(carpool, maxDistance, distance, depotCoordinate);
+			horizon[i].scheduleMusts(carpool, maxDistance, distance);
 		}
 	}
 

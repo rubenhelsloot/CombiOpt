@@ -18,4 +18,8 @@ public class Stack {
     public Location peak(){
         return header.data;
     }
+    
+    public int size() {
+    	return header.size();
+    }
 }

@@ -14,11 +14,11 @@ public class Request {
 	public int remaining;
 	
 	
-	Request(int id, int[][] array, int[][] locations, int depotID) {
+	Request(int id, int[][] array, int[][] locations, Depot depot) {
 		this.id = id;
 		int locationID = array[id - 1][1];
 		location = new Location(locationID, locations[locationID][1], locations[locationID][2], 
-				locations[depotID][1], locations[depotID][2]);
+				depot.location);
 		first = array[id - 1][2];
 		last = array[id - 1][3];
 		duration = array[id - 1][4];
