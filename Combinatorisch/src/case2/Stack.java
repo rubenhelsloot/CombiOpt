@@ -7,19 +7,23 @@ public class Stack {
         header = null;
     }
 
-    public void push(Location l) {
-        header = new Node(l, header);
+    public void push(Request r) {
+        header = new Node(r, header);
     }
-    public Location pop() {
-        Location popped = header.data;
+    public Request pop() {
+        Request popped = header.data;
         header = header.next;
         return popped;
     }
-    public Location peak(){
+    public Request peak(){
         return header.data;
     }
     
     public int size() {
     	return header.size();
+    }
+    
+    public void print() {
+    	header.print();
     }
 }

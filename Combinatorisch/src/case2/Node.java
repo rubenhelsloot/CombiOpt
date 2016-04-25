@@ -1,9 +1,9 @@
 package case2;
 
 public class Node {
-    Location data;
+    Request data;
     Node next;
-    public Node(Location d, Node n) {
+    public Node(Request d, Node n) {
         data = d;
         next = n;
     }
@@ -13,5 +13,12 @@ public class Node {
     		return next.size() + 1;
     	}
     	return 1;
+    }
+    
+    public void print() {
+    	System.out.println("Data id: " + data.id);
+    	if (next != null) {
+    		next.print();
+    	}
     }
 }

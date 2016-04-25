@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-//import jsprit.*;
 
 public class Main {
 
@@ -189,6 +188,7 @@ public class Main {
 
 	void schedule() {
 		for (int i = 0; i < days; i++) {
+			System.out.println("Day " + i);
 			horizon[i].init(requestlist);
 			int carpool = (int) Math.ceil(horizon[i].getInitialToolSpace(tools) * 1.0 / capacity);
 			horizon[i].scheduleMusts(carpool, maxDistance, distance);
