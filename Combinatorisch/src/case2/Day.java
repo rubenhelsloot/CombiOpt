@@ -156,16 +156,16 @@ public class Day {
 		for(int i = 1; i < locations.size(); i+=0) {	
 			if (!isRight(locations.get(i), stack.header.data, stack.header.next.data)) {
 				System.out.println("Size: " + stack.size());
-				stack.print();
 				stack.push(locations.get(i));
+				stack.print();
 				i++;
 			} else {
-				System.out.println("To pop: " + stack.peek().id);
 				Location l = stack.pop();
 				System.out.println("Popped: " + l.id);
 				if (stack.size() == 1) {
 					stack.push(locations.get(i));
-					locations.set(i, l);
+					stack.push(l);
+					i++;
 				}
 			}
 		}
