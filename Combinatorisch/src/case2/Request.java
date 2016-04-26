@@ -3,7 +3,7 @@ package case2;
 public class Request {
 
 	public int id;
-	public Location location;
+	public int locationId;
 	public int first;
 	public int last;
 	public int duration;
@@ -14,11 +14,9 @@ public class Request {
 	public int remaining;
 	
 	
-	Request(int id, int[][] array, int[][] locations, Depot depot) {
+	Request(int id, int[][] array) {
 		this.id = id;
-		int locationID = array[id - 1][1];
-		location = new Location(locationID, locations[locationID][1], locations[locationID][2], 
-				depot.location);
+		locationId = array[id - 1][1];
 		first = array[id - 1][2];
 		last = array[id - 1][3];
 		duration = array[id - 1][4];

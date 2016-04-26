@@ -1,12 +1,12 @@
 package case2;
 
 public class Edge {
-    Request start;
-    Request end;
+    Location start;
+    Location end;
     int length;
-    public Edge(Request data, Request data2) {
+    public Edge(Location data, Location data2) {
         this.start = data;
         this.end = data2;
-        length = data.location.distance(data2.location);
+        length = data.distance(data2);
     }
 }

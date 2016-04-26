@@ -1,10 +1,10 @@
 package case2;
 
 public class Node {
-    Request data;
+    Location data;
     Node next;
-    public Node(Request d, Node n) {
-        data = d;
+    public Node(Location l, Node n) {
+        data = l;
         next = n;
     }
     

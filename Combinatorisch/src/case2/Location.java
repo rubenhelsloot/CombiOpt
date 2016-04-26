@@ -8,6 +8,9 @@ public class Location implements Comparable {
 	int y;
 	double angle; //with depot
 	boolean visited;
+	ArrayList<Request> requests;
+	ArrayList<Request> must;
+	ArrayList<Request> may;
 	
 	Location(int id, int x, int y, int dx, int dy) {
 		this.id = id;
@@ -37,6 +40,11 @@ public class Location implements Comparable {
 	
 	void init() {
 		visited = false;
+		requests = new ArrayList<>();
+	}
+	
+	void addRequest(Request r) {
+		requests.add(r);
 	}
 	
 	void visit() {
@@ -80,6 +88,22 @@ public class Location implements Comparable {
             }
         }
         return 0;
+    }
+    
+    boolean classifyRequests(int day) {
+    	must = new ArrayList<>();
+    	may = new ArrayList<>();
+    	boolean hasMusts = false;
+    	
+    	for (Request r : requests) {
+    		if ((r.delivered && r.remaining == 0) || (!r.delivered && r.last == day)) {
+				hasMusts = true;
+				must.add(r);
+    		} else if (!r.delivered && day >= r.first) {
+    			may.add(r);
+    		}
+    	}
+    	return hasMusts;
     }
     
     void print() {

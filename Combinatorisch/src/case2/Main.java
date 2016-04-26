@@ -22,12 +22,13 @@ public class Main {
 
 	Day[] horizon;
 	Depot depot;
-	ArrayList<Request> requestlist;
+	ArrayList<Location> locationList;
 
 	Main() {
 		map = new HashMap<>();
 		arrayMap = new HashMap<>();
 		out = new PrintStream(System.out);
+		locationList = new ArrayList<>();
 	}
 
 	Main(String str) {
@@ -35,6 +36,7 @@ public class Main {
 		map = new HashMap<>();
 		arrayMap = new HashMap<>();
 		out = new PrintStream(System.out);
+		locationList = new ArrayList<>();
 		start(s);
 	}
 
@@ -173,25 +175,31 @@ public class Main {
 		depot = new Depot(depotCoordinate, coordinates[depotCoordinate][1], coordinates[depotCoordinate][2], tools, capacity,
 				maxTripDistance);
 		for (int i = 0; i < days; i++) {
-			horizon[i] = new Day(i, depot);
+			horizon[i] = new Day(i+1, depot);
 		}
-		requestlist = fillRequestList(requests);
-	}
-
-	ArrayList<Request> fillRequestList(int[][] requests) {
-		ArrayList<Request> result = new ArrayList<>();
-		for (int i = 0; i < requests.length; i++) {
-			result.add(new Request(requests[i][0], requests, coordinates, depot));
+		
+		for (int i = 0; i < coordinates.length; i++) {
+			if(i != depotCoordinate) {
+				Location l = new Location(
+						i,
+						coordinates[i][1],
+						coordinates[i][2],
+						depot.location
+						);
+				locationList.add(l);
+			}
 		}
-		return result;
+		
+		for (int i = 1; i <= requests.length; i++) {
+			locationList.get(requests[i-1][1] - 1).addRequest(new Request(i, requests));
+		}
 	}
 
 	void schedule() {
 		for (int i = 0; i < days; i++) {
 			System.out.println("Day " + i);
-			horizon[i].init(requestlist);
-			int carpool = (int) Math.ceil(horizon[i].getInitialToolSpace(tools) * 1.0 / capacity);
-			horizon[i].scheduleMusts(carpool, maxDistance, distance);
+			horizon[i].init(locationList);
+			horizon[i].scheduleMusts(maxDistance, distance);
 		}
 	}
 
@@ -217,5 +225,3 @@ public class Main {
 		new Main().start(args);
 	}
 }
-
-// TODO: Algorithm selection
