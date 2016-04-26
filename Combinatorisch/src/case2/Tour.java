@@ -20,4 +20,16 @@ public class Tour {
 		}
 		return this;
 	}
+	
+	void print() {
+		for (Edge e : tour) {
+			if (e != null) {
+				System.out.println(e.start.id + " " + e.end.id);
+			} else {
+				System.out.println(e);
+			}
+			//System.out.println("(" +e.start.location.x + "," +e.start.location.y+ ") - (" +
+			//		e.end.location.x + "," + e.end.location.y + ") " + e.length);
+		}
+	}
 }

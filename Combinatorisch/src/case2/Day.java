@@ -33,10 +33,10 @@ public class Day {
 	void scheduleMusts(int maxDistance, int[][] distances) {
 		must.add(depot.location);
 		Tour t = cheapestInsertion(convexHullFinder(must), must, distances);
-		printEdges(t);
+		t.print();
 		t.cycle(depot.location.id);
 		System.out.println(" ");
-		printEdges(t);
+		t.print();
 	}
 
 	void recursiveSchedule(ArrayList<Request> pickups, ArrayList<Request> deliveries) {
@@ -48,39 +48,39 @@ public class Day {
 		// }
 	}
 	
-//	List<Location> cheapestInsertion(Set<Location> locations) {
-//		List<Location> route = new ArrayList<Location>(locations.size() + 1);
-//		Iterator<Location> itr = locations.iterator();
-//		if (itr.hasNext()) {
-//			Location l = itr.next();
-//			int insertion = 0;
-//			while (!locations.isEmpty()) {
-//				route.add(insertion, l);
-//				if (locations.remove(l) && locations.isEmpty()) {
-//					break;
-//				}
-//				Location nearest = null;
-//				insertion = -1;
-//				double min = Double.POSITIVE_INFINITY;
-//				Location n0 = route.get(route.size() - 1);
-//				for (int i = 0; i < route.size(); i++) {
-//					Location n1 = route.get(i);
-//					for (Location n2 : locations) {
-//						double distance = Math.abs(n0.distance(n2) + n2.distance(n1) - n0.distance(n1));
-//						if (min > distance) {
-//							min = distance;
-//							insertion = i;
-//							nearest = n2;
-//						}
-//					}
-//					n0 = n1;
-//				}
-//				assert insertion != -1 && nearest != null;
-//				l = nearest;
-//			}
-//		}
-//		return route;
-//	}
+	List<Location> cheapestInsertion(Set<Location> locations) {
+		List<Location> route = new ArrayList<Location>(locations.size() + 1);
+		Iterator<Location> itr = locations.iterator();
+		if (itr.hasNext()) {
+			Location l = itr.next();
+			int insertion = 0;
+			while (!locations.isEmpty()) {
+				route.add(insertion, l);
+				if (locations.remove(l) && locations.isEmpty()) {
+					break;
+				}
+				Location nearest = null;
+				insertion = -1;
+				double min = Double.POSITIVE_INFINITY;
+				Location n0 = route.get(route.size() - 1);
+				for (int i = 0; i < route.size(); i++) {
+					Location n1 = route.get(i);
+					for (Location n2 : locations) {
+						double distance = Math.abs(n0.distance(n2) + n2.distance(n1) - n0.distance(n1));
+						if (min > distance) {
+							min = distance;
+							insertion = i;
+							nearest = n2;
+						}
+					}
+					n0 = n1;
+				}
+				assert insertion != -1 && nearest != null;
+				l = nearest;
+			}
+		}
+		return route;
+	}
 
 	Tour cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {
 		Tour tour = new Tour();
@@ -88,7 +88,7 @@ public class Day {
 		Node current = convexHull.header;
 		int i = 0;
 		
-//		convexHull.print();
+		convexHull.print();
 		
 		while (current.next != null) {
 			tour.tour.add(new Edge(current.data, current.next.data));
@@ -155,10 +155,14 @@ public class Day {
 		stack.push(locations.get(0));
 		for(int i = 1; i < locations.size(); i+=0) {	
 			if (!isRight(locations.get(i), stack.header.data, stack.header.next.data)) {
+				System.out.println("Size: " + stack.size());
+				stack.print();
 				stack.push(locations.get(i));
 				i++;
 			} else {
+				System.out.println("To pop: " + stack.peek().id);
 				Location l = stack.pop();
+				System.out.println("Popped: " + l.id);
 				if (stack.size() == 1) {
 					stack.push(locations.get(i));
 					locations.set(i, l);
@@ -202,18 +206,6 @@ public class Day {
 	void printLocations(ArrayList<Location> locations) {
 		for (int i = 0; i < locations.size(); i++) {
 			locations.get(i).print();
-		}
-	}
-	
-	void printEdges(Tour t) {
-		for (Edge e : t.tour) {
-			if (e != null) {
-				System.out.println(e.start.id + " " + e.end.id);
-			} else {
-				System.out.println(e);
-			}
-			//System.out.println("(" +e.start.location.x + "," +e.start.location.y+ ") - (" +
-			//		e.end.location.x + "," + e.end.location.y + ") " + e.length);
 		}
 	}
 

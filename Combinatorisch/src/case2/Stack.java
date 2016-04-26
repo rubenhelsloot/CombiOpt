@@ -15,7 +15,7 @@ public class Stack {
         header = header.next;
         return popped;
     }
-    public Location peak(){
+    public Location peek(){
         return header.data;
     }
     
@@ -24,6 +24,8 @@ public class Stack {
     }
     
     public void print() {
+    	System.out.print("Stack:");
     	header.print();
+    	System.out.print("\n");
     }
 }

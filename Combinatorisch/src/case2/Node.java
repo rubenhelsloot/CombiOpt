@@ -16,7 +16,7 @@ public class Node {
     }
     
     public void print() {
-    	System.out.println("Data id: " + data.id);
+    	System.out.print(" " + data.id);
     	if (next != null) {
     		next.print();
     	}
