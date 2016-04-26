@@ -31,24 +31,12 @@ public class Day {
 	}
 
 	void scheduleMusts(int maxDistance, int[][] distances) {
-		ArrayList<Request> pickups = new ArrayList<>();
-		ArrayList<Request> deliveries = new ArrayList<>();
-		for (Location l : must) {
-			for(Request r : l.must) {
-				if (r.delivered) {
-					pickups.add(r);
-				} else {
-					deliveries.add(r);
-				}
-			}
-		}
 		must.add(depot.location);
-//		Set<Location> s = new HashSet<Location>();
-//		for (Location l : must) {
-			
-//		}
-		Stack convexHull = convexHullFinder(must);
-		cheapestInsertion(convexHull, must, distances);
+		Tour t = cheapestInsertion(convexHullFinder(must), must, distances);
+		printEdges(t);
+		t.cycle(depot.location.id);
+		System.out.println(" ");
+		printEdges(t);
 	}
 
 	void recursiveSchedule(ArrayList<Request> pickups, ArrayList<Request> deliveries) {
@@ -60,49 +48,50 @@ public class Day {
 		// }
 	}
 	
-	List<Location> cheapestInsertion(Set<Location> locations) {
-		List<Location> route = new ArrayList<Location>(locations.size() + 1);
-		Iterator<Location> itr = locations.iterator();
-		if (itr.hasNext()) {
-			Location l = itr.next();
-			int insertion = 0;
-			while (!locations.isEmpty()) {
-				route.add(insertion, l);
-				if (locations.remove(l) && locations.isEmpty()) {
-					break;
-				}
-				Location nearest = null;
-				insertion = -1;
-				double min = Double.POSITIVE_INFINITY;
-				Location n0 = route.get(route.size() - 1);
-				for (int i = 0; i < route.size(); i++) {
-					Location n1 = route.get(i);
-					for (Location n2 : locations) {
-						double distance = Math.abs(n0.distance(n2) + n2.distance(n1) - n0.distance(n1));
-						if (min > distance) {
-							min = distance;
-							insertion = i;
-							nearest = n2;
-						}
-					}
-					n0 = n1;
-				}
-				assert insertion != -1 && nearest != null;
-				l = nearest;
-			}
-		}
-		return route;
-	}
+//	List<Location> cheapestInsertion(Set<Location> locations) {
+//		List<Location> route = new ArrayList<Location>(locations.size() + 1);
+//		Iterator<Location> itr = locations.iterator();
+//		if (itr.hasNext()) {
+//			Location l = itr.next();
+//			int insertion = 0;
+//			while (!locations.isEmpty()) {
+//				route.add(insertion, l);
+//				if (locations.remove(l) && locations.isEmpty()) {
+//					break;
+//				}
+//				Location nearest = null;
+//				insertion = -1;
+//				double min = Double.POSITIVE_INFINITY;
+//				Location n0 = route.get(route.size() - 1);
+//				for (int i = 0; i < route.size(); i++) {
+//					Location n1 = route.get(i);
+//					for (Location n2 : locations) {
+//						double distance = Math.abs(n0.distance(n2) + n2.distance(n1) - n0.distance(n1));
+//						if (min > distance) {
+//							min = distance;
+//							insertion = i;
+//							nearest = n2;
+//						}
+//					}
+//					n0 = n1;
+//				}
+//				assert insertion != -1 && nearest != null;
+//				l = nearest;
+//			}
+//		}
+//		return route;
+//	}
 
-	Edge[] cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {
-		Edge[] edges = new Edge[locations.size()];
+	Tour cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {
+		Tour tour = new Tour();
+		tour.tour = new ArrayList<Edge>();
 		Node current = convexHull.header;
 		int i = 0;
 		
-		convexHull.print();
+//		convexHull.print();
 		
 		while (current.next != null) {
-			edges[i] = new Edge(current.data, current.next.data);
+			tour.tour.add(new Edge(current.data, current.next.data));
 			current.data.visit();
 			current.next.data.visit();
 			current = current.next;
@@ -110,7 +99,7 @@ public class Day {
 		}
 
 		while (i < locations.size()) {
-			Edge e = edges[0];
+			Edge e = tour.tour.get(0);
 			int replace = 0;
 			int a = 0;
 			
@@ -118,7 +107,7 @@ public class Day {
 				a++;
 				if (a == locations.size()) {
 					System.out.println("Hull contained all nodes");
-					return edges;
+					return tour;
 				}
 			}
 			
@@ -128,9 +117,9 @@ public class Day {
 			for (int j = a + 1; j < locations.size(); j++) {
 				if (!locations.get(j).visited) {
 					for (int k = 0; k < i; k++) {
-						if (insertionGain(distances, edges[k], locations.get(j).id) < dist) {
-							dist = insertionGain(distances, edges[k], locations.get(j).id);
-							e = edges[k];
+						if (insertionGain(distances, tour.tour.get(k), locations.get(j).id) < dist) {
+							dist = insertionGain(distances, tour.tour.get(k), locations.get(j).id);
+							e = tour.tour.get(k);
 							l = locations.get(j);
 							replace = k;
 						}
@@ -138,18 +127,21 @@ public class Day {
 				}
 			}
 			
-			edges[replace] = new Edge(e.start, l);
-			edges[i] = new Edge(e.end, l);
+			tour.tour.set(replace, new Edge(e.start, l));
+			if(tour.tour.size() > i) {
+				tour.tour.set(i, new Edge(l, e.end));
+			} else {
+				tour.tour.add(new Edge(l, e.end));
+			}
 			l.visit();
 			i++;
 		}
 		int total = 0;
-		for (Edge e : edges) {
+		for (Edge e : tour.tour) {
 			total += e != null ? e.length : 0;
 		}
 		System.out.println("Cheapest insertion length: " + total);
-//		printEdges(edges);
-		return edges;
+		return tour;
 	}
 
 	int insertionGain(int[][] distances, Edge e, int id) {
@@ -161,9 +153,7 @@ public class Day {
 		locations = sortByAngle(locations);
 		stack.push(locations.get(locations.size() - 1));
 		stack.push(locations.get(0));
-		System.out.println("Locations:" + locations.size());
 		for(int i = 1; i < locations.size(); i+=0) {	
-			System.out.println("Location no. " + i + " ("+stack.size()+")");
 			if (!isRight(locations.get(i), stack.header.data, stack.header.next.data)) {
 				stack.push(locations.get(i));
 				i++;
@@ -215,8 +205,8 @@ public class Day {
 		}
 	}
 	
-	void printEdges(Edge[] edges) {
-		for (Edge e : edges) {
+	void printEdges(Tour t) {
+		for (Edge e : t.tour) {
 			if (e != null) {
 				System.out.println(e.start.id + " " + e.end.id);
 			} else {
