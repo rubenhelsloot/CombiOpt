@@ -178,7 +178,7 @@ public class Main {
 			horizon[i] = new Day(i+1, depot);
 		}
 		
-		for (int i = 0; i < coordinates.length; i++) {
+		/*for (int i = 0; i < coordinates.length; i++) {
 			if(i != depotCoordinate) {
 				Location l = new Location(
 						i,
@@ -188,10 +188,21 @@ public class Main {
 						);
 				locationList.add(l);
 			}
-		}
+		}*/
 		
 		for (int i = 1; i <= requests.length; i++) {
-			locationList.get(requests[i-1][1] - 1).addRequest(new Request(i, requests));
+			
+			Location l = new Location(
+					i,
+					coordinates[i][1],
+					coordinates[i][2],
+					depot.location,
+					new Request(i, requests)
+					);
+			
+			locationList.add(l);
+			
+			//locationList.get(requests[i-1][1] - 1).addRequest(new Request(i, requests));
 		}
 	}
 

@@ -15,11 +15,15 @@ public class Tour {
 		int i = 0;
 		while(tour.get(0).start.id != depotId && i < max) {
 			Edge e = tour.remove(0);
-			tour.add(e);
+			if(tour.add(e)){
+				
+			}
 			i++;
 		}
 		return this;
 	}
+	
+	
 	
 	void print() {
 		for (Edge e : tour) {

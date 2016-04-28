@@ -22,9 +22,9 @@ public class Day {
 
 	void init(ArrayList<Location> locations) {
 		for(Location l : locations) {
-			if(l.classifyRequests(dayId)) {
+			if(l.classifyRequest(dayId)) {
 				must.add(l);
-			} else if (l.may.size() > 0) {
+			} else {
 				may.add(l);
 			}
 		}
