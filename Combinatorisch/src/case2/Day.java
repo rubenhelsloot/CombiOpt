@@ -1,7 +1,6 @@
 package case2;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -12,10 +11,12 @@ public class Day {
 	public ArrayList<Location> may;
 	public int dayId;
 	private Depot depot;
+	boolean debug;
 
 	Day(int dayId, Depot depot) {
 		this.depot = depot;
 		this.dayId = dayId;
+		if(dayId == 3) debug = true;
 		must = new ArrayList<>();
 		may = new ArrayList<>();
 	}
@@ -33,10 +34,14 @@ public class Day {
 	void scheduleMusts(int maxDistance, int[][] distances) {
 		must.add(depot.location);
 		Tour t = cheapestInsertion(convexHullFinder(must), must, distances);
-		t.print();
+//		if(debug) t.print();
 		t.cycle(depot.location.id);
-		System.out.println(" ");
-		t.print();
+//		if (debug) {
+//			System.out.println(" ");
+//			t.print();
+//			new Scatterplot(must, t);
+//		}
+		new Scatterplot(must, t);
 	}
 
 	void recursiveSchedule(ArrayList<Request> pickups, ArrayList<Request> deliveries) {
@@ -48,47 +53,13 @@ public class Day {
 		// }
 	}
 	
-	List<Location> cheapestInsertion(Set<Location> locations) {
-		List<Location> route = new ArrayList<Location>(locations.size() + 1);
-		Iterator<Location> itr = locations.iterator();
-		if (itr.hasNext()) {
-			Location l = itr.next();
-			int insertion = 0;
-			while (!locations.isEmpty()) {
-				route.add(insertion, l);
-				if (locations.remove(l) && locations.isEmpty()) {
-					break;
-				}
-				Location nearest = null;
-				insertion = -1;
-				double min = Double.POSITIVE_INFINITY;
-				Location n0 = route.get(route.size() - 1);
-				for (int i = 0; i < route.size(); i++) {
-					Location n1 = route.get(i);
-					for (Location n2 : locations) {
-						double distance = Math.abs(n0.distance(n2) + n2.distance(n1) - n0.distance(n1));
-						if (min > distance) {
-							min = distance;
-							insertion = i;
-							nearest = n2;
-						}
-					}
-					n0 = n1;
-				}
-				assert insertion != -1 && nearest != null;
-				l = nearest;
-			}
-		}
-		return route;
-	}
-
 	Tour cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {
 		Tour tour = new Tour();
 		tour.tour = new ArrayList<Edge>();
 		Node current = convexHull.header;
 		int i = 0;
 		
-		convexHull.print();
+		if (debug) convexHull.print();
 		
 		while (current.next != null) {
 			tour.tour.add(new Edge(current.data, current.next.data));
@@ -96,6 +67,8 @@ public class Day {
 			current.next.data.visit();
 			current = current.next;
 			i++;
+			
+			if (!tour.contains(depot.location)) depot.location.visited = false;
 		}
 
 		while (i < locations.size()) {
@@ -155,17 +128,17 @@ public class Day {
 		stack.push(locations.get(0));
 		for(int i = 1; i < locations.size(); i+=0) {	
 			if (!isRight(locations.get(i), stack.header.data, stack.header.next.data)) {
-				System.out.println("Size: " + stack.size());
-				stack.print();
+//				if (debug) System.out.println("Size: " + stack.size());
 				stack.push(locations.get(i));
+//				if (debug) stack.print();
 				i++;
 			} else {
-				System.out.println("To pop: " + stack.peek().id);
 				Location l = stack.pop();
-				System.out.println("Popped: " + l.id);
+//				if (debug) System.out.println("Popped: " + l.id);
 				if (stack.size() == 1) {
 					stack.push(locations.get(i));
-					locations.set(i, l);
+					stack.push(l);
+					i++;
 				}
 			}
 		}

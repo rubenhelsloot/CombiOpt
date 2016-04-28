@@ -28,12 +28,21 @@ public class Tour {
 	void print() {
 		for (Edge e : tour) {
 			if (e != null) {
-				System.out.println(e.start.id + " " + e.end.id);
+				e.print();
 			} else {
 				System.out.println(e);
 			}
 			//System.out.println("(" +e.start.location.x + "," +e.start.location.y+ ") - (" +
 			//		e.end.location.x + "," + e.end.location.y + ") " + e.length);
 		}
+	}
+	
+	boolean contains(Location l) {
+		for (Edge e : tour) {
+			if(l.id == e.start.id || l.id == e.end.id) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
