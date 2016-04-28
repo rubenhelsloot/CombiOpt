@@ -24,7 +24,7 @@ public class Tour {
 	void print() {
 		for (Edge e : tour) {
 			if (e != null) {
-				System.out.println(e.start.id + " " + e.end.id);
+				e.print();
 			} else {
 				System.out.println(e);
 			}

@@ -9,4 +9,8 @@ public class Edge {
         this.end = data2;
         length = data.distance(data2);
     }
+    
+    void print() {
+    	System.out.println(start.id + " " + end.id);
+    }
 }
