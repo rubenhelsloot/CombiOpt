@@ -178,31 +178,18 @@ public class Main {
 			horizon[i] = new Day(i+1, depot);
 		}
 		
-		/*for (int i = 0; i < coordinates.length; i++) {
-			if(i != depotCoordinate) {
-				Location l = new Location(
-						i,
-						coordinates[i][1],
-						coordinates[i][2],
-						depot.location
-						);
-				locationList.add(l);
-			}
-		}*/
-		
 		for (int i = 1; i <= requests.length; i++) {
+			Request r = new Request(i, requests);
 			
 			Location l = new Location(
-					i,
-					coordinates[i][1],
-					coordinates[i][2],
+					r.locationId,
+					coordinates[r.locationId][1],
+					coordinates[r.locationId][2],
 					depot.location,
-					new Request(i, requests)
+					r
 					);
 			
 			locationList.add(l);
-			
-			//locationList.get(requests[i-1][1] - 1).addRequest(new Request(i, requests));
 		}
 	}
 

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Vehicle {
 
 	int maxCap;
-	int capacity;
+	int weight;
 	int maxDist;
 	int distTravelled;
 	ArrayList<Tool> load;
@@ -15,12 +15,12 @@ public class Vehicle {
 	Vehicle(int maxCap, int maxDist) {
 		this.maxCap = maxCap;
 		this.maxDist = maxDist;
-		load = new ArrayList<Tool>(maxCap);
+		load = new ArrayList<Tool>();
 		init();
 	}
 
 	void init() {
-		capacity = 0;
+		weight = 0;
 		distTravelled = 0;
 	}
 
@@ -32,25 +32,42 @@ public class Vehicle {
 		return result;
 	}
 
-	void load(Location l) {
-		for(int i = 0; i < r.amount; i++){
-			if(load.add(r.t)){
-				capacity += t.size;
-				t.globalAvailable--;
+	void load(Location l) {		
+		if(l.isDepot) {
+
+		} else {
+			for(int i = 0; i < l.r.amount; i++) {
+				for(int j = 0; j < l.r.stack.length; j++) {
+					load.add(l.r.stack[j]);
+					weight += l.r.stack[j].size;
+				}
+
+				l.r.clearStack();
 			}
 		}
 	}
 
-	void unload(Tool t) {
-		if(load.remove(t)){
-			capacity -= t.size;
-			t.globalAvailable++;
+	void unload(Location l) {
+		if(l.isDepot) {
+
+		} else {
+			int type = l.r.type;
+
+			for(int i = 0; i < l.r.amount; i++) {
+				for(int j = 0; j < load.size(); j++) {
+					if(load.get(j).type == type) {
+						l.r.stack[i] = load.get(j);
+						load.remove(j);
+						weight -= l.r.stack[i].size;
+					}
+				}
+			}
 		}
 	}
 
 	void activity(Request r){
 		if(r.delivered){
-			load(r.);
+
 		}
 
 	}

@@ -37,4 +37,10 @@ public class Request {
 			t.endOfDay();
 		}
 	}
+	
+	void clearStack() {
+		for(int i = 0; i < stack.length; i++) {
+			stack[i] = null;
+		}
+	}
 }
