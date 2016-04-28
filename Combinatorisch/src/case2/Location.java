@@ -8,6 +8,7 @@ public class Location implements Comparable {
 	int y;
 	double angle; //with depot
 	boolean visited;
+	boolean isDepot;
 	ArrayList<Request> requests;
 	ArrayList<Request> must;
 	ArrayList<Request> may;
@@ -17,6 +18,7 @@ public class Location implements Comparable {
 		this.x = x;
 		this.y = y;
 		this.angle = Math.atan2(y - dy, x - dx);
+		isDepot = (x == dy && y == dy && angle == 0);
 		
 		init();
 	}
@@ -26,7 +28,7 @@ public class Location implements Comparable {
 		this.x = x;
 		this.y = y;
 		this.angle = Math.atan2(y - d.y, x - d.x);
-		
+		isDepot = (x == d.y && y == d.y && angle == 0);
 		init();
 	}
 	
@@ -35,6 +37,8 @@ public class Location implements Comparable {
 		this.x = x;
 		this.y = y;
 		this.angle = 0;
+		isDepot = true;
+		
 		init();
 	}
 	

@@ -1,7 +1,6 @@
 package case2;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +36,8 @@ public class Day {
 		t.cycle(depot.location.id);
 		System.out.println(" ");
 		t.print();
+		
+		Scatterplot plot = new Scatterplot(must, t);
 	}
 
 	void recursiveSchedule(ArrayList<Request> pickups, ArrayList<Request> deliveries) {
