@@ -19,7 +19,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class Scatterplot extends javax.swing.JFrame {
 	private ArrayList<Location> nodes = new ArrayList<>();
 	Location depot;
-	public static final int MODIFIER = 5;
+	public static final int MODIFIER = 8;
 
 	public Scatterplot(ArrayList<Location> al, Tour t) {
 		super("Scatterplot");
@@ -41,7 +41,7 @@ public class Scatterplot extends javax.swing.JFrame {
 				
 				g2d.setColor(Color.BLUE);
 				g2d.setStroke(new BasicStroke((float) (0.5 * MODIFIER)));
-				g2d.setFont(new Font( "SansSerif", Font.BOLD, 8));
+				g2d.setFont(new Font( "SansSerif", Font.BOLD, 12));
 				
 				for (Edge e : t.tour) {
 					Line2D ln = new Line2D.Float(MODIFIER * e.start.x, MODIFIER* e.start.y,

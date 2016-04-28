@@ -32,4 +32,13 @@ public class Tour {
 			//		e.end.location.x + "," + e.end.location.y + ") " + e.length);
 		}
 	}
+	
+	boolean contains(Location l) {
+		for (Edge e : tour) {
+			if(l.id == e.start.id || l.id == e.end.id) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
