@@ -11,10 +11,12 @@ public class Vehicle {
 	ArrayList<Tool> load;
 	Request[] planning;
 	Tour tour;
+	Depot depot;
 
-	Vehicle(int maxCap, int maxDist) {
+	Vehicle(int maxCap, int maxDist, Depot depot) {
 		this.maxCap = maxCap;
 		this.maxDist = maxDist;
+		this.depot = depot;
 		load = new ArrayList<Tool>();
 		init();
 	}

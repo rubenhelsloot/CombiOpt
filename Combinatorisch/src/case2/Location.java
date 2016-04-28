@@ -18,19 +18,18 @@ public class Location implements Comparable {
 		this.id = id;
 		this.x = x;
 		this.y = y;
-		this.angle = Math.atan2(y - dy, x - dx);
+		angle = Math.atan2(y - dy, x - dx);
 		isDepot = (x == dy && y == dy && angle == 0);
 		init();
 	}
 	
-
-	Location(int id, int x, int y, Location d, Request r) {
-		this.id = id;
-		this.x = x;
-		this.y = y;
-		this.r = r;
-		this.angle = Math.atan2(y - d.y, x - d.x);
+	Location(Request r, int[][] coordinates, Location d) {
+		id = r.locationId;
+		x = coordinates[id][1];
+		y = coordinates[id][y];
+		angle = Math.atan2(y - d.y, x - d.x);
 		isDepot = (x == d.y && y == d.y && angle == 0);
+		this.r = r;
 		
 		init();
 	}

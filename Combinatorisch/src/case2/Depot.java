@@ -35,7 +35,7 @@ public class Depot {
 	}
 	
 	void planVehicleRoute(Request[] planning) {
-		if (carpark.size() == 0) carpark.add(new Vehicle(maxCap, maxDist));
+		if (carpark.size() == 0) carpark.add(new Vehicle(maxCap, maxDist, this));
 		Vehicle v = carpark.get(0);
 		v.plan(planning);
 	}

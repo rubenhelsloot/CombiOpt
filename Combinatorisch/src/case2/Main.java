@@ -180,15 +180,7 @@ public class Main {
 		
 		for (int i = 1; i <= requests.length; i++) {
 			Request r = new Request(i, requests);
-			
-			Location l = new Location(
-					r.locationId,
-					coordinates[r.locationId][1],
-					coordinates[r.locationId][2],
-					depot.location,
-					r
-					);
-			
+			Location l = new Location(r, coordinates, depot.location);
 			locationList.add(l);
 		}
 	}
