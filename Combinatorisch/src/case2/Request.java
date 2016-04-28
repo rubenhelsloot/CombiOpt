@@ -12,8 +12,7 @@ public class Request {
 	public boolean delivered;
 	public Tool[] stack;
 	public int remaining;
-	
-	
+
 	Request(int id, int[][] array) {
 		this.id = id;
 		locationId = array[id - 1][1];
@@ -25,22 +24,21 @@ public class Request {
 		delivered = false;
 		stack = new Tool[amount];
 	}
-	
+
 	void isDelivered() {
 		delivered = true;
 	}
-	
+
 	void endOfDay() {
-		if (delivered) duration--;
-		
-		for(Tool t : stack) {
+		if (delivered)
+			duration--;
+
+		for (Tool t : stack) {
 			t.endOfDay();
 		}
 	}
-	
+
 	void clearStack() {
-		for(int i = 0; i < stack.length; i++) {
-			stack[i] = null;
-		}
+		stack = new Tool[0];
 	}
 }

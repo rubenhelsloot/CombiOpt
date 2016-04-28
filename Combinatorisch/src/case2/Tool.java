@@ -24,6 +24,6 @@ public class Tool {
 	
 	void isMoved(int daysTillPickup) {
 		onLocation = !onLocation; 
-		inUse = onLocation; //TODO: Unsure.
+		inUse = onLocation;
 	}
 }

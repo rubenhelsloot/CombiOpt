@@ -172,12 +172,12 @@ public class Main {
 
 	void setup() {
 		horizon = new Day[days];
-		depot = new Depot(depotCoordinate, coordinates[depotCoordinate][1], coordinates[depotCoordinate][2], tools, capacity,
-				maxTripDistance);
+		depot = new Depot(depotCoordinate, coordinates[depotCoordinate][1], coordinates[depotCoordinate][2], tools,
+				capacity, maxTripDistance);
 		for (int i = 0; i < days; i++) {
-			horizon[i] = new Day(i+1, depot);
+			horizon[i] = new Day(i + 1, depot);
 		}
-		
+
 		for (int i = 1; i <= requests.length; i++) {
 			Request r = new Request(i, requests);
 			Location l = new Location(r, coordinates, depot.location);

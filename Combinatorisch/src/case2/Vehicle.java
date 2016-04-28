@@ -28,18 +28,19 @@ public class Vehicle {
 
 	int toolsByType(int type) {
 		int result = 0;
-		for(Tool t : load) {
-			if(t.type == type) result ++;
+		for (Tool t : load) {
+			if (t.type == type)
+				result++;
 		}
 		return result;
 	}
 
-	void load(Location l) {		
-		if(l.isDepot) {
+	void load(Location l) {
+		if (l.isDepot) {
 
 		} else {
-			for(int i = 0; i < l.r.amount; i++) {
-				for(int j = 0; j < l.r.stack.length; j++) {
+			for (int i = 0; i < l.r.amount; i++) {
+				for (int j = 0; j < l.r.stack.length; j++) {
 					load.add(l.r.stack[j]);
 					weight += l.r.stack[j].size;
 				}
@@ -50,14 +51,14 @@ public class Vehicle {
 	}
 
 	void unload(Location l) {
-		if(l.isDepot) {
+		if (l.isDepot) {
 
 		} else {
 			int type = l.r.type;
 
-			for(int i = 0; i < l.r.amount; i++) {
-				for(int j = 0; j < load.size(); j++) {
-					if(load.get(j).type == type) {
+			for (int i = 0; i < l.r.amount; i++) {
+				for (int j = 0; j < load.size(); j++) {
+					if (load.get(j).type == type) {
 						l.r.stack[i] = load.get(j);
 						load.remove(j);
 						weight -= l.r.stack[i].size;
@@ -67,14 +68,12 @@ public class Vehicle {
 		}
 	}
 
-	void activity(Request r){
-		if(r.delivered){
+	void activity(Request r) {
+		if (r.delivered) {
 
 		}
 
 	}
-
-
 
 	void plan(Request[] planning) {
 		this.planning = planning;
