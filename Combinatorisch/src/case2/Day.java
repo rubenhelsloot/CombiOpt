@@ -35,7 +35,11 @@ public class Day {
 		must.add(depot.location);
 		Tour t = cheapestInsertion(convexHullFinder(must), must, distances);
 //		if(debug) t.print();
-		t.cycle(depot.location.id);
+		t.cycle();
+		
+		Vehicle v = new Vehicle(514, 514, depot);
+		v.addTour(t);
+
 //		if (debug) {
 //			System.out.println(" ");
 //			t.print();
@@ -113,6 +117,20 @@ public class Day {
 		for (Edge e : tour.tour) {
 			total += e != null ? e.length : 0;
 		}
+		
+		for(int j = 1; j < tour.tour.size(); j++) {
+			Edge beforeE = tour.tour.get(j-1);
+			Edge currentE = tour.tour.get(j);
+			
+			if(beforeE.end.id != currentE.start.id) {
+				Edge temp = tour.tour.get(j);
+				tour.tour.remove(j);
+				tour.tour.add(temp);
+				
+				j -= 1;
+			}
+		}
+		
 		System.out.println("Cheapest insertion length: " + total);
 		return tour;
 	}

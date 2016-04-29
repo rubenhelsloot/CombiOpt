@@ -9,16 +9,19 @@ public class Tour {
 		tour = new ArrayList<>();
 	}
 
-	Tour cycle(int depotId) {
+	Tour cycle() {
 		int max = tour.size();
 		int i = 0;
-		while (tour.get(0).start.id != depotId && i < max) {
-			Edge e = tour.remove(0);
-			if (tour.add(e)) {
 
-			}
+		while (/*tour.get(0).start.id != depot.location.id &&*/ i < max) {
+			Edge e = tour.get(0);
+			tour.add(e);
+			System.out.println(tour.get(0).start.id + " - " + tour.get(0).end.id);
+			tour.remove(0);
+
 			i++;
 		}
+
 		return this;
 	}
 
@@ -29,6 +32,7 @@ public class Tour {
 			} else {
 				System.out.println(e);
 			}
+
 			// System.out.println("(" +e.start.location.x + ","
 			// +e.start.location.y+ ") - (" +
 			// e.end.location.x + "," + e.end.location.y + ") " + e.length);
