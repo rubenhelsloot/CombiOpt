@@ -49,15 +49,15 @@ public class Tour {
 
 		for (int i = 0; i < tour.size() - 1; i++) {
 			Edge e = tour.get(i);
-			if (weights.get(e.end.r.type) == null)
+			if (!e.end.isDepot && weights.get(e.end.r.type) == null)
 				weights.put(e.end.r.type, e.end.r.tool.size);
 
-			System.out.print("Type: " + e.end.r.type + " Amount: ");
-			if (e.end.r.delivered)
-				System.out.print("-");
-			System.out.print(e.end.r.amount + " In: " + inVehicle.getOrDefault(e.end.r.type, 0) + " Max: "
-					+ max.getOrDefault(e.end.r.type, 0) + " Min: " + min.getOrDefault(e.end.r.type, 0)
-					+ " " + e.end.r.delivered + "\n");
+//			System.out.print("Type: " + e.end.r.type + " Amount: ");
+//			if (e.end.r.delivered)
+//				System.out.print("-");
+//			System.out.print(e.end.r.amount + " In: " + inVehicle.getOrDefault(e.end.r.type, 0) + " Max: "
+//					+ max.getOrDefault(e.end.r.type, 0) + " Min: " + min.getOrDefault(e.end.r.type, 0)
+//					+ " " + e.end.r.delivered + "\n");
 			
 			if (e.end.isDepot) {
 				inVehicle.clear();
@@ -96,5 +96,9 @@ public class Tour {
 			}
 		}
 		return false;
+	}
+	
+	boolean validate(int maxCap, int maxDist) {
+		return (length() < maxDist && weight() < maxCap);
 	}
 }

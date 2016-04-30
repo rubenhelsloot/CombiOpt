@@ -19,7 +19,7 @@ public class Scatterplot extends javax.swing.JFrame {
 	Location depot;
 	public static final int MODIFIER = 8;
 
-	public Scatterplot(ArrayList<Location> al, Tour t) {
+	public Scatterplot(ArrayList<Location> al, Tour t, int dayId) {
 		super("Scatterplot");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -45,6 +45,75 @@ public class Scatterplot extends javax.swing.JFrame {
 					Line2D ln = new Line2D.Float(MODIFIER * e.start.x, MODIFIER* e.start.y,
 							MODIFIER* e.end.x, MODIFIER * e.end.y);
 					g2d.draw(ln);
+				}
+				
+				for (Location l : nodes) {
+					g2d.setColor(Color.BLACK);
+					Point2D.Float pt = new Point2D.Float(l.x, l.y);
+					Ellipse2D dot = new Ellipse2D.Float(MODIFIER * (pt.x - 1), MODIFIER * (pt.y - 1), 2*MODIFIER, 2*MODIFIER);
+					g2d.fill(dot);
+					g2d.setColor(Color.WHITE);
+					g2d.drawString("" + l.id, MODIFIER* (pt.x - 1), (float) (MODIFIER*(pt.y + 0.8)));
+				}
+				
+				g2d.setColor(Color.RED);
+				Ellipse2D dot = new Ellipse2D.Float(MODIFIER * (depot.x - 1), MODIFIER * (depot.y - 1), 2*MODIFIER, 2*MODIFIER);
+				g2d.fill(dot);
+				
+				g2d.dispose();
+			};
+		};
+
+		setContentPane(panel);
+		
+		int xmin = (int) Double.POSITIVE_INFINITY;
+		int ymin = (int) Double.POSITIVE_INFINITY;
+		int xmax = (int) Double.NEGATIVE_INFINITY;
+		int ymax = (int) Double.NEGATIVE_INFINITY;
+		for(Location l : al) {
+			xmin = Math.min(xmin, l.x);
+			ymin = Math.min(ymin, l.y);
+			xmax = Math.max(xmax, l.x);
+			ymax = Math.max(ymax, l.y);
+		}
+		
+		xmin *= MODIFIER;
+		ymin *= MODIFIER;
+		xmax *= MODIFIER;
+		ymax *= MODIFIER;
+		
+		setBounds((int) (xmin * 0.8), (int) (ymin*0.8), xmax + xmin, (int) ((ymax + ymin)*1.3));
+		setVisible(true);
+	}
+	
+	public Scatterplot(ArrayList<Location> al, ArrayList<Tour> tours, int dayId) {
+		super("Day: " + dayId);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace();
+        }
+
+		addPoints(al);
+
+		JPanel panel = new JPanel() {
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2d = (Graphics2D) g.create();
+				
+				g2d.setColor(Color.BLUE);
+				g2d.setStroke(new BasicStroke((float) (0.5 * MODIFIER)));
+				g2d.setFont(new Font( "SansSerif", Font.BOLD, 12));
+				
+				for (Tour t : tours) {
+					for (Edge e : t.tour) {
+						Line2D ln = new Line2D.Float(MODIFIER * e.start.x, MODIFIER* e.start.y,
+								MODIFIER* e.end.x, MODIFIER * e.end.y);
+						g2d.draw(ln);
+					}
 				}
 				
 				for (Location l : nodes) {

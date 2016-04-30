@@ -55,7 +55,7 @@ public class Vehicle {
 	}
 
 	void load(Location l) {
-		System.out.println("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
+//		System.out.println("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
 		for (int i = 0; i < l.r.amount; i++) {
 			load.add(l.r.stack[i]);
 			weight += l.r.stack[i].size;
@@ -65,7 +65,7 @@ public class Vehicle {
 	}
 
 	void unload(Location l) {
-		System.out.println("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
+//		System.out.println("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
 		if (l.isDepot) {
 			while (load.size() > 0) {
 				Tool t = load.remove(0);

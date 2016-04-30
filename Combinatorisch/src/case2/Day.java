@@ -23,8 +23,6 @@ public class Day {
 
 	void init(ArrayList<Location> locations) {
 		all = locations;
-		if (debug)
-			System.out.println("this is breakpoint");
 		for (Location l : locations) {
 			System.out.print(l.r.id);
 			if (l.r.delivered)
@@ -41,35 +39,78 @@ public class Day {
 
 	void scheduleMusts(int[][] distances) {
 		must.add(depot.location);
-		System.out.print("Must: ");
-		for (Location l : must) {
-			System.out.print(l.id + " ");
-		}
-		System.out.print("\n");
-		Tour t = cheapestInsertion(convexHullFinder(must), must, distances);
-		t.cycle(depot.location);
+		Tour t = cheapestInsertion(convexHullFinder(must), must, distances).cycle(depot.location);
 
-		// System.out.println((t.weight() < depot.maxCap) + " " + (t.length() <
-		// depot.maxDist));
-
-		Vehicle v = depot.getVehicle();
-		v.addTour(t);
-
-		all.add(depot.location);
-		new Scatterplot(all, t);
-		all.remove(depot.location);
-
-		System.out.print("Delivering: ");
-		for (Edge e : t.tour) {
-			if (!e.end.isDepot) {
-				System.out.print(e.end.id + " ");
-				e.end.r.deliver();
+		if (t.length() < depot.maxDist && t.weight() < depot.maxCap) {
+			Vehicle v = depot.getVehicle();
+			v.addTour(t);
+			all.add(depot.location);
+			new Scatterplot(all, t, dayId);
+			all.remove(depot.location);
+			
+			System.out.print("Delivering: ");
+			for (Edge e : t.tour) {
+				if (!e.end.isDepot) {
+					System.out.print(e.end.id + " ");
+					e.end.r.deliver();
+				}
+			}
+			System.out.print("\n");
+		} else {
+			System.out.println("Route unfit " + (t.length() < depot.maxDist) + (t.weight() < depot.maxCap));
+			int vehicles = Math.max((int) Math.ceil(t.length() * 1.0 / depot.maxDist),
+					(int) Math.ceil(t.weight() * 1.0 / depot.maxCap));
+			ArrayList<ArrayList<Location>> clusters = new KMeans(vehicles, must, depot.location).getClusters();
+			ArrayList<Tour> tours = new ArrayList<>();
+			for (ArrayList<Location> c : clusters) {
+				if (c.size() == 1) {
+					System.out.println("HERE! OVER HERE!");
+				}
+				c.add(depot.location);
+				tours.add(cheapestInsertion(convexHullFinder(c), c, distances).cycle(depot.location));
+			}
+			
+			while(!validateAll(tours, depot.maxCap, depot.maxDist)) {
+				vehicles = 0;
+				for (Tour tour : tours) {
+					System.out.println("Subroute unfit length: " + (tour.length() < depot.maxDist) + " weight: " + (tour.weight() < depot.maxCap));
+					vehicles += Math.max((int) Math.ceil(tour.length() * 1.0 / depot.maxDist),
+							(int) Math.ceil(tour.weight() * 1.0 / depot.maxCap));
+				}
+				System.out.println("Try with " + vehicles + " vehicles");
+				clusters = new KMeans(vehicles, must, depot.location).getClusters();
+				tours = new ArrayList<>();
+				for (ArrayList<Location> c : clusters) {
+					c.add(depot.location);
+					tours.add(cheapestInsertion(convexHullFinder(c), c, distances).cycle(depot.location));
+				}
+			}
+			
+			all.add(depot.location);
+			new Scatterplot(all, tours, dayId);
+			all.remove(depot.location);
+			
+			for (Tour tour : tours) {
+				Vehicle v = depot.getVehicle();
+				v.addTour(tour);
+				
+				System.out.print("Delivering: ");
+				for (Edge e : tour.tour) {
+					if (!e.end.isDepot) {
+						System.out.print(e.end.id + " ");
+						e.end.r.deliver();
+					}
+				}
+				System.out.print("\n");
 			}
 		}
-		System.out.print("\n");
 	}
 
 	Tour cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {
+		if (convexHull.size() == 3 && dayId == 4) {
+			System.out.println("Hello world");
+		}
+		
 		Tour tour = new Tour();
 		tour.tour = new ArrayList<Edge>();
 		Node current = convexHull.header;
@@ -97,7 +138,8 @@ public class Day {
 			while (locations.get(a).visited) {
 				a++;
 				if (a == locations.size()) {
-					System.out.println("Hull contained all nodes");
+					System.out.print("Hull contained all nodes: ");
+					tour.print();
 					return tour;
 				}
 			}
@@ -129,16 +171,21 @@ public class Day {
 		return tour;
 	}
 
-	int insertionGain(int[][] distances, Edge e, int id) {
-		return distances[e.start.id][id] + distances[e.end.id][id] - e.length;
-	}
-
 	public Stack convexHullFinder(ArrayList<Location> locations) {
 		Stack stack = new Stack();
+		
+		if (locations.size() == 2) {
+			stack.push(depot.location);
+			stack.push(locations.get(0));
+			stack.push(depot.location);
+			return stack;
+		}
+		
 		locations = sortByAngle(locations);
 		stack.push(locations.get(locations.size() - 1));
 		stack.push(locations.get(0));
-		for (int i = 1; i < locations.size(); i += 0) {
+		int i = 1;
+		while (i < locations.size()) {
 			if (!isRight(locations.get(i), stack.header.data, stack.header.next.data)) {
 				// if (debug) System.out.println("Size: " + stack.size());
 				stack.push(locations.get(i));
@@ -199,4 +246,15 @@ public class Day {
 		return ((Ptop.x - Ptop1.x) * (P.y - Ptop1.y) - (Ptop.y - Ptop1.y) * (P.x - Ptop1.x) <= 0);
 	}
 
+	int insertionGain(int[][] distances, Edge e, int id) {
+		return distances[e.start.id][id] + distances[e.end.id][id] - e.length;
+	}
+	
+	boolean validateAll(ArrayList<Tour> tours, int maxCap, int maxDist) {
+		for(Tour t : tours) {
+			if (!t.validate(maxCap, maxDist))
+				return false;
+		}
+		return true;
+	}
 }
