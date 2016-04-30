@@ -70,12 +70,6 @@ public class Tour {
 				inVehicle.put(e.end.r.type, current);
 				min.put(e.end.r.type, Math.min(current, min.getOrDefault(e.end.r.type, 0)));
 			}
-
-			System.out.print("Type: " + e.end.r.type + " Amount: ");
-			if (e.end.r.delivered)
-				System.out.print("-");
-			System.out.print(e.end.r.amount + " In: " + inVehicle.getOrDefault(e.end.r.type, 0) + " Max: "
-					+ max.getOrDefault(e.end.r.type, 0) + " Min: " + min.getOrDefault(e.end.r.type, 0) + "\n");
 		}
 
 		Set<Integer> weightSet = weights.keySet();
@@ -88,13 +82,11 @@ public class Tour {
 	}
 
 	void print() {
+		System.out.print("Tour: ");
 		for (Edge e : tour) {
-			if (e != null) {
-				e.print();
-			} else {
-				System.out.println(e);
-			}
+			e.print();
 		}
+		System.out.print("\n");
 	}
 
 	boolean contains(Location l) {

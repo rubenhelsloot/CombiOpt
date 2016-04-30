@@ -12,6 +12,6 @@ public class Edge {
     }
     
     void print() {
-    	System.out.println(start.id + " " + end.id);
+    	System.out.print("(" + start.id + ", " + end.id + ") ");
     }
 }

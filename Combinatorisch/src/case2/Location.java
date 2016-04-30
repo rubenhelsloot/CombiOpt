@@ -1,7 +1,5 @@
 package case2;
 
-import java.util.ArrayList;
-
 public class Location implements Comparable {
 	int id;
 	int x;
@@ -10,9 +8,6 @@ public class Location implements Comparable {
 	boolean visited;
 	boolean isDepot;
 	Request r;
-	ArrayList<Request> requests;
-	ArrayList<Request> must;
-	ArrayList<Request> may;
 
 	Location(Request r, int[][] coordinates, int dx, int dy) {
 		id = r.locationId;
@@ -21,8 +16,7 @@ public class Location implements Comparable {
 		angle = Math.atan2(y - dy, x - dx);
 		isDepot = (x == dy && y == dy && angle == 0);
 		this.r = r;
-
-		init();
+		visited = false;
 	}
 
 	Location(Request r, int[][] coordinates, Location d) {
@@ -32,8 +26,7 @@ public class Location implements Comparable {
 		angle = Math.atan2(y - d.y, x - d.x);
 		isDepot = (x == d.y && y == d.y && angle == 0);
 		this.r = r;
-
-		init();
+		visited = false;
 	}
 
 	Location(int id, int x, int y) {
@@ -42,11 +35,12 @@ public class Location implements Comparable {
 		this.y = y;
 		this.angle = 0;
 		isDepot = true;
-		init();
+		visited = false;
 	}
 
-	void init() {
+	void endOfDay() {
 		visited = false;
+		r.endOfDay();
 	}
 
 	void visit() {

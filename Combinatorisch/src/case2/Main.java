@@ -14,7 +14,7 @@ public class Main {
 
 	BufferedReader br = null;
 	FileReader fr;
-	int days, capacity, maxTripDistance, depotCoordinate, vehicleCost, vehicleDayCost, distanceCost, maxDistance;
+	int days, capacity, maxTripDistance, depotCoordinate, vehicleCost, vehicleDayCost, distanceCost;
 	int[][] tools, coordinates, requests, distance;
 	Map<String, Integer> map;
 	Map<String, int[][]> arrayMap;
@@ -85,7 +85,6 @@ public class Main {
 		coordinates = arrayMap.get("COORDINATES");
 		requests = arrayMap.get("REQUESTS");
 		distance = arrayMap.get("DISTANCE");
-		maxDistance = maxValue(distance);
 	}
 
 	void readVariables(ArrayList<String> al) {
@@ -179,7 +178,7 @@ public class Main {
 		}
 
 		for (int i = 1; i <= requests.length; i++) {
-			Request r = new Request(i, requests);
+			Request r = new Request(i, requests, new Tool(requests[i - 1][5], tools));
 			Location l = new Location(r, coordinates, depot.location);
 			locationList.add(l);
 		}
@@ -187,9 +186,20 @@ public class Main {
 
 	void schedule() {
 		for (int i = 0; i < days; i++) {
-			System.out.println("Day " + i);
+			System.out.println("Day " + (i + 1));
 			horizon[i].init(locationList);
-			horizon[i].scheduleMusts(maxDistance, distance);
+			horizon[i].scheduleMusts(distance);
+
+			int j = 0;
+			while(j < locationList.size()) {
+				Location l = locationList.get(j);
+				l.endOfDay();
+				if (l.r.closed) {
+					locationList.remove(l);
+				} else {
+					j++;
+				}
+			}
 		}
 	}
 

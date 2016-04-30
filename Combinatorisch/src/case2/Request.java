@@ -12,8 +12,10 @@ public class Request {
 	public boolean delivered;
 	public Tool[] stack;
 	public int remaining;
+	public Tool tool;
+	public boolean closed;
 
-	Request(int id, int[][] array) {
+	Request(int id, int[][] array, Tool t) {
 		this.id = id;
 		locationId = array[id - 1][1];
 		first = array[id - 1][2];
@@ -22,19 +24,26 @@ public class Request {
 		type = array[id - 1][5];
 		amount = array[id - 1][6];
 		delivered = false;
+		closed = false;
 		stack = new Tool[amount];
+		tool = t;
 	}
 
-	void isDelivered() {
-		delivered = true;
+	void deliver() {
+		if (delivered) {
+			closed = true;
+		} else {
+			delivered = true;
+			remaining = duration;
+		}
 	}
 
 	void endOfDay() {
-		if (delivered)
-			duration--;
-
-		for (Tool t : stack) {
-			t.endOfDay();
+		if (delivered) {
+			remaining--;
+			for (Tool t : stack) {
+				t.endOfDay();
+			}
 		}
 	}
 

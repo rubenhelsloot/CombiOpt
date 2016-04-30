@@ -26,7 +26,6 @@ public class Vehicle {
 		distTravelled = 0;
 	}
 
-
 	int toolsByType(int type) {
 		int result = 0;
 		for (Tool t : load) {
@@ -37,22 +36,26 @@ public class Vehicle {
 	}
 
 	void loadFromDepot(Location l) {
-		int type = l.r.type;
+		if (depot.toolsByType(l.r.type) < l.r.amount)
+			return;
 
-		for (int i = 0; i < l.r.amount; i++) {
-			for (int j = 0; j < depot.toolstack.size(); j++) {					
-				if(type == depot.toolstack.get(j).type) {
-					load.add(depot.toolstack.get(j));
-					weight += depot.toolstack.get(j).size;
-					depot.toolstack.remove(j);
-
-					j = depot.toolstack.size() - 1;
-				}
+		int loaded = 0;
+		int i = 0;
+		while (i < depot.toolstack.size() && (loaded < l.r.amount)) {
+			if (l.r.type == depot.toolstack.get(i).type) {
+				load.add(depot.toolstack.remove(i));
+				weight += depot.toolstack.get(i).size;
+				loaded++;
+				// System.out.println("Loading: " + loaded + " out of " +
+				// l.r.amount);
+			} else {
+				i++;
 			}
 		}
 	}
 
 	void load(Location l) {
+		System.out.println("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
 		for (int i = 0; i < l.r.amount; i++) {
 			load.add(l.r.stack[i]);
 			weight += l.r.stack[i].size;
@@ -62,24 +65,25 @@ public class Vehicle {
 	}
 
 	void unload(Location l) {
+		System.out.println("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
 		if (l.isDepot) {
-			for(int i = 0; i < load.size(); i++) {
-				depot.toolstack.add(load.get(i));
-				weight -= load.get(i).size;
-				load.remove(i);
+			while (load.size() > 0) {
+				Tool t = load.remove(0);
+				depot.toolstack.add(t);
+				weight -= t.size;
 			}
 		} else {
-			int type = l.r.type;
-			
-			for (int i = 0; i < l.r.amount; i++) {
-				for (int j = 0; j < load.size(); j++) {
-					if (load.get(j).type == type) {
-						l.r.stack[i] = load.get(j);
-						load.remove(j);
-						weight -= l.r.stack[i].size;
-						
-						j = load.size() - 1;
-					}
+			int unloaded = 0;
+			int i = 0;
+			while (unloaded < l.r.amount) {
+				if (l.r.type == load.get(i).type) {
+					l.r.stack[unloaded] = load.remove(i);
+					weight += l.r.stack[unloaded].size;
+					unloaded++;
+					// System.out.println("Unloaded: " + unloaded + " out of " +
+					// l.r.amount);
+				} else {
+					i++;
 				}
 			}
 		}
@@ -88,50 +92,27 @@ public class Vehicle {
 	void addTour(Tour t) {
 		this.t = t;
 
-		int i = 0;
+		for (int i = 0; i < t.tour.size() - 1; i++) {
+			if (t.tour.get(i).start.isDepot) {
+				int j = i;
 
-		System.out.println("Tour size: " + t.tour.size());
-		
-		while(t.tour.get(i) != t.tour.get(t.tour.size() - 1)) {
-			if(t.tour.get(i).start.id == depot.location.id) {
-				int j = 0;
-
-				while(t.tour.get(j).end.id != depot.location.id) {
-					if(!t.tour.get(j).end.r.delivered) {
+				while (!t.tour.get(j).end.isDepot) {
+					if (!t.tour.get(j).end.r.delivered) {
 						loadFromDepot(t.tour.get(j).end);
 					}
 
 					j++;
 				}
-				
-				System.out.println("Weight: " + weight);
-			} 
-						
-			if(t.tour.get(i).end.id == depot.location.id) {
-				unload(t.tour.get(i).end);
-			} else {
-				if(t.tour.get(i).end.r.delivered) {
-					load(t.tour.get(i).end);
-				} else {
-					unload(t.tour.get(i).end);
-				}
 			}
-			
-			System.out.println("Weight: " + weight);
-			
-			i++;
-		}
-		
-		int length = 0;
-		
-		for(int j = 0; j < t.tour.size(); j++) {
-			length += t.tour.get(j).length;
-		}
-		
-		System.out.println("Length: " + length);
-	}
 
-	void plan(Request[] planning) {
-		this.planning = planning;
+			if (t.tour.get(i).end.id == depot.location.id) {
+				unload(t.tour.get(i).end);
+			} else if (t.tour.get(i).end.r.delivered) {
+				load(t.tour.get(i).end);
+			} else {
+				unload(t.tour.get(i).end);
+			}
+		}
+		System.out.print("Weight: " + weight + ", length: " + t.length() + "\n");
 	}
 }

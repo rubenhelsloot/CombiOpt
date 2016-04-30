@@ -9,8 +9,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -84,7 +82,7 @@ public class Scatterplot extends javax.swing.JFrame {
 		xmax *= MODIFIER;
 		ymax *= MODIFIER;
 		
-		setBounds(xmin, ymin, xmax + xmin, ymax + ymin);
+		setBounds((int) (xmin * 0.8), (int) (ymin*0.8), xmax + xmin, (int) ((ymax + ymin)*1.3));
 		setVisible(true);
 	}
 

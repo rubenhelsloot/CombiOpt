@@ -1,14 +1,12 @@
 package case2;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public class Day {
 
 	public ArrayList<Location> must;
 	public ArrayList<Location> may;
+	public ArrayList<Location> all;
 	public int dayId;
 	private Depot depot;
 	boolean debug;
@@ -16,70 +14,86 @@ public class Day {
 	Day(int dayId, Depot depot) {
 		this.depot = depot;
 		this.dayId = dayId;
-		if(dayId == 3) debug = true;
+		if (dayId == 2 || dayId == 3)
+			debug = true;
 		must = new ArrayList<>();
 		may = new ArrayList<>();
+		all = new ArrayList<>();
 	}
 
 	void init(ArrayList<Location> locations) {
-		for(Location l : locations) {
-			if(l.classifyRequest(dayId)) {
+		all = locations;
+		if (debug)
+			System.out.println("this is breakpoint");
+		for (Location l : locations) {
+			System.out.print(l.r.id);
+			if (l.r.delivered)
+				System.out.print("-" + l.r.remaining);
+			System.out.print(" ");
+			if (l.classifyRequest(dayId)) {
 				must.add(l);
 			} else {
 				may.add(l);
 			}
 		}
+		System.out.print("\n");
 	}
 
-	void scheduleMusts(int maxDistance, int[][] distances) {
+	void scheduleMusts(int[][] distances) {
 		must.add(depot.location);
+		System.out.print("Must: ");
+		for (Location l : must) {
+			System.out.print(l.id + " ");
+		}
+		System.out.print("\n");
 		Tour t = cheapestInsertion(convexHullFinder(must), must, distances);
-//		if(debug) t.print();
-		t.cycle();
-		
-		Vehicle v = new Vehicle(514, 514, depot);
+		t.cycle(depot.location);
+
+		// System.out.println((t.weight() < depot.maxCap) + " " + (t.length() <
+		// depot.maxDist));
+
+		Vehicle v = depot.getVehicle();
 		v.addTour(t);
 
-//		if (debug) {
-//			System.out.println(" ");
-//			t.print();
-//			new Scatterplot(must, t);
-//		}
-		new Scatterplot(must, t);
+		all.add(depot.location);
+		new Scatterplot(all, t);
+		all.remove(depot.location);
+
+		System.out.print("Delivering: ");
+		for (Edge e : t.tour) {
+			if (!e.end.isDepot) {
+				System.out.print(e.end.id + " ");
+				e.end.r.deliver();
+			}
+		}
+		System.out.print("\n");
 	}
 
-	void recursiveSchedule(ArrayList<Request> pickups, ArrayList<Request> deliveries) {
-
-		// if(pickups.size() > 0) {
-		// Request r = pickups.get(0);
-		// deliveries = sortByLocation(deliveries, r.location);
-		//
-		// }
-	}
-	
 	Tour cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {
 		Tour tour = new Tour();
 		tour.tour = new ArrayList<Edge>();
 		Node current = convexHull.header;
 		int i = 0;
-		
-		if (debug) convexHull.print();
-		
+
+		if (debug)
+			convexHull.print();
+
 		while (current.next != null) {
 			tour.tour.add(new Edge(current.data, current.next.data));
 			current.data.visit();
 			current.next.data.visit();
 			current = current.next;
 			i++;
-			
-			if (!tour.contains(depot.location)) depot.location.visited = false;
+
+			if (!tour.contains(depot.location))
+				depot.location.visited = false;
 		}
 
 		while (i < locations.size()) {
 			Edge e = tour.tour.get(0);
 			int replace = 0;
 			int a = 0;
-			
+
 			while (locations.get(a).visited) {
 				a++;
 				if (a == locations.size()) {
@@ -87,10 +101,10 @@ public class Day {
 					return tour;
 				}
 			}
-			
+
 			Location l = locations.get(a);
 			double dist = insertionGain(distances, e, depot.location.id);
-			
+
 			for (int j = a + 1; j < locations.size(); j++) {
 				if (!locations.get(j).visited) {
 					for (int k = 0; k < i; k++) {
@@ -103,35 +117,15 @@ public class Day {
 					}
 				}
 			}
-			
+
 			tour.tour.set(replace, new Edge(e.start, l));
-			if(tour.tour.size() > i) {
-				tour.tour.set(i, new Edge(l, e.end));
-			} else {
-				tour.tour.add(new Edge(l, e.end));
-			}
+			tour.tour.add(replace + 1, new Edge(l, e.end));
 			l.visit();
 			i++;
 		}
-		int total = 0;
-		for (Edge e : tour.tour) {
-			total += e != null ? e.length : 0;
-		}
-		
-		for(int j = 1; j < tour.tour.size(); j++) {
-			Edge beforeE = tour.tour.get(j-1);
-			Edge currentE = tour.tour.get(j);
-			
-			if(beforeE.end.id != currentE.start.id) {
-				Edge temp = tour.tour.get(j);
-				tour.tour.remove(j);
-				tour.tour.add(temp);
-				
-				j -= 1;
-			}
-		}
-		
-		System.out.println("Cheapest insertion length: " + total);
+		tour.print();
+		System.out.println("Cheapest insertion length: " + tour.length());
+
 		return tour;
 	}
 
@@ -144,15 +138,15 @@ public class Day {
 		locations = sortByAngle(locations);
 		stack.push(locations.get(locations.size() - 1));
 		stack.push(locations.get(0));
-		for(int i = 1; i < locations.size(); i+=0) {	
+		for (int i = 1; i < locations.size(); i += 0) {
 			if (!isRight(locations.get(i), stack.header.data, stack.header.next.data)) {
-//				if (debug) System.out.println("Size: " + stack.size());
+				// if (debug) System.out.println("Size: " + stack.size());
 				stack.push(locations.get(i));
-//				if (debug) stack.print();
+				// if (debug) stack.print();
 				i++;
 			} else {
 				Location l = stack.pop();
-//				if (debug) System.out.println("Popped: " + l.id);
+				// if (debug) System.out.println("Popped: " + l.id);
 				if (stack.size() == 1) {
 					stack.push(locations.get(i));
 					stack.push(l);
@@ -179,8 +173,9 @@ public class Day {
 		return locations;
 	}
 
-	public ArrayList<Location> sortByAngle(ArrayList<Location> locations) {		
-		if (locations.size() < 2) return locations;
+	public ArrayList<Location> sortByAngle(ArrayList<Location> locations) {
+		if (locations.size() < 2)
+			return locations;
 
 		for (int i = 0; i < locations.size() - 1; i++) {
 			for (int j = 0; j < locations.size() - i - 1; j++) {
