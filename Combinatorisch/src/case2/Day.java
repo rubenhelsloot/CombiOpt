@@ -7,6 +7,7 @@ public class Day {
 	public ArrayList<Location> must;
 	public ArrayList<Location> may;
 	public ArrayList<Location> all;
+	public ArrayList<Tour> tours;
 	public int dayId;
 	private Depot depot;
 	boolean debug;
@@ -61,11 +62,8 @@ public class Day {
 			int vehicles = Math.max((int) Math.ceil(t.length() * 1.0 / depot.maxDist),
 					(int) Math.ceil(t.weight() * 1.0 / depot.maxCap));
 			ArrayList<ArrayList<Location>> clusters = new KMeans(vehicles, must, depot.location).getClusters();
-			ArrayList<Tour> tours = new ArrayList<>();
+			tours = new ArrayList<>();
 			for (ArrayList<Location> c : clusters) {
-				if (c.size() == 1) {
-					System.out.println("HERE! OVER HERE!");
-				}
 				c.add(depot.location);
 				tours.add(cheapestInsertion(convexHullFinder(c), c, distances).cycle(depot.location));
 			}
@@ -106,18 +104,11 @@ public class Day {
 		}
 	}
 
-	Tour cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {
-		if (convexHull.size() == 3 && dayId == 4) {
-			System.out.println("Hello world");
-		}
-		
+	Tour cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {		
 		Tour tour = new Tour();
 		tour.tour = new ArrayList<Edge>();
 		Node current = convexHull.header;
 		int i = 0;
-
-		if (debug)
-			convexHull.print();
 
 		while (current.next != null) {
 			tour.tour.add(new Edge(current.data, current.next.data));

@@ -1,8 +1,10 @@
 package case2;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -12,8 +14,8 @@ import java.util.Scanner;
 
 public class Main {
 
-	BufferedReader br = null;
-	FileReader fr;
+	BufferedWriter bw;
+	BufferedReader br;
 	int days, capacity, maxTripDistance, depotCoordinate, vehicleCost, vehicleDayCost, distanceCost;
 	int[][] tools, coordinates, requests, distance;
 	Map<String, Integer> map;
@@ -29,15 +31,6 @@ public class Main {
 		arrayMap = new HashMap<>();
 		out = new PrintStream(System.out);
 		locationList = new ArrayList<>();
-	}
-
-	Main(String str) {
-		String[] s = { str };
-		map = new HashMap<>();
-		arrayMap = new HashMap<>();
-		out = new PrintStream(System.out);
-		locationList = new ArrayList<>();
-		start(s);
 	}
 
 	void printArray(int[][] array) {
@@ -59,11 +52,14 @@ public class Main {
 		return result;
 	}
 
-	void readFile(BufferedReader br) throws Exception {
+	void readFile() throws Exception {
 		String line;
 		ArrayList<String> al = new ArrayList<>();
-		br.readLine();
-		br.readLine();
+		bw.write(br.readLine());
+		bw.newLine();
+		bw.write(br.readLine());
+		bw.newLine();
+		bw.newLine();
 
 		while ((line = br.readLine()) != null) {
 			if (line.length() == 0) {
@@ -202,26 +198,80 @@ public class Main {
 			}
 		}
 	}
-
-	void start(String[] args) {
-		for (int i = 0; i < args.length; i++) {
-			try {
-				br = new BufferedReader(new InputStreamReader(new FileInputStream(args[i])));
-				try {
-					readFile(br);
-				} finally {
-					br.close();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+	
+	void writeOutput() {
+		try {
+//			writeSummary();
+			writeDay();
+			bw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	void writeSummary() throws Exception {
+		int maxVehicles = 0;
+		int noVehicleDays = 0;
+//		int[] toolUse = new int[horizon.length];
+		int distance = 0;
+		int cost = 0;
+		for (Day d : horizon) {
+			maxVehicles = Math.max(maxVehicles, d.tours.size());
+			for (Tour t : d.tours) {
+				noVehicleDays++;
+				distance += t.length();
+				cost += vehicleDayCost + distanceCost * t.length();
 			}
+		}
+		cost += vehicleCost * maxVehicles;
+	}
+	
+	void writeDay() throws Exception {
+		for (Day d : horizon) {
+			if (d.tours.size() > 0) {
+				bw.write("DAY = " + d.dayId);
+				bw.newLine();
+				bw.write("NUMBER_OF_VEHICLES = " + d.tours.size());
+				bw.newLine();
+				int i = 1;
+				String write = "";
+				for (Tour t : d.tours) {
+					write += i + " R " + depotCoordinate + " ";
+					for (Edge e : t.tour) {
+						if (!e.end.isDepot) {
+							write += e.end.r.printed ? "-" : "";
+							e.end.r.printOutput();
+							write += e.end.r.id + " ";
+						} else {
+							write += depotCoordinate;
+						}
+					}
+					i++;
+					bw.write(write);
+					bw.newLine();
+					write = "";
+				}
+				bw.newLine();
+			}
+		}
+	}
+
+	void start(String input, String output) {
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
+			bw = new BufferedWriter(new FileWriter(output));
+			readFile();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		setup();
 		schedule();
+		
+		writeOutput();
 	}
 
 	public static void main(String[] args) {
-		new Main().start(args);
+		new Main().start(args[0], args[1]);
 	}
 }

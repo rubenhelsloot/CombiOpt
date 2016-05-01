@@ -14,6 +14,7 @@ public class Request {
 	public int remaining;
 	public Tool tool;
 	public boolean closed;
+	public boolean printed;
 
 	Request(int id, int[][] array, Tool t) {
 		this.id = id;
@@ -25,6 +26,7 @@ public class Request {
 		amount = array[id - 1][6];
 		delivered = false;
 		closed = false;
+		printed = false;
 		stack = new Tool[amount];
 		tool = t;
 	}
@@ -49,5 +51,9 @@ public class Request {
 
 	void clearStack() {
 		stack = new Tool[0];
+	}
+	
+	void printOutput() {
+		printed = true;
 	}
 }
