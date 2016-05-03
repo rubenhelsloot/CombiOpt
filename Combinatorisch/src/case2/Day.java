@@ -30,36 +30,65 @@ public class Day {
 			System.out.print(" ");
 			if (l.classifyRequest(dayId)) {
 				must.add(l);
-			} else {
+				
+			} else if (l.classifyMay(dayId)){
 				may.add(l);
 			}
 		}
 		System.out.print("\n");
+		
 	}
 
 	void scheduleMusts(int[][] distances) {
+		System.out.print(" MUST LIST: ");
+		for(int i=0 ; i<must.size(); i++){
+			System.out.print(must.get(i).r.locationId+" ");
+		}
+		System.out.print("\n");
+		System.out.print(" MAY LIST: ");
+		for(int i=0 ; i<may.size(); i++){
+			System.out.print(may.get(i).r.locationId+" ");
+		}
+		System.out.print("\n");
 		must.add(depot.location);
-		Tour t = cheapestInsertion(convexHullFinder(must), must, distances).cycle(depot.location);
-
-		if (t.length() < depot.maxDist && t.weight() < depot.maxCap) {
-			Vehicle v = depot.getVehicle();
-			v.addTour(t);
+		
+		ArrayList<Tour> t = new ArrayList<>();
+		t.add(cheapestInsertion(convexHullFinder(must), must, distances).cycle(depot.location));
+		/*int k =0;
+		ArrayList<Location> temp = new ArrayList<Location>();
+	
+		while(validateAll(t, depot.maxCap, depot.maxDist)){
+			temp.add(may.get(k));
+			t.add(cheapestInsertion(convexHullFinder(temp), temp, distances).cycle(depot.location));
+			System.out.println(" ADDED MAY TO ROUTE --------------------------------------------------------------");
+			k++;
+		}
+		*/
+		if (validateAll(t, depot.maxCap, depot.maxDist)) {
+			for (Tour tour : t) {
+				Vehicle v = depot.getVehicle();
+				v.addTour(tour);
+			
 			all.add(depot.location);
 			new Scatterplot(all, t, dayId);
 			all.remove(depot.location);
 			
 			System.out.print("Delivering: ");
-			for (Edge e : t.tour) {
+			for (Edge e : tour.tour) {
 				if (!e.end.isDepot) {
 					System.out.print(e.end.id + " ");
 					e.end.r.deliver();
 				}
 			}
 			System.out.print("\n");
+			}
 		} else {
-			System.out.println("Route unfit " + (t.length() < depot.maxDist) + (t.weight() < depot.maxCap));
-			int vehicles = Math.max((int) Math.ceil(t.length() * 1.0 / depot.maxDist),
-					(int) Math.ceil(t.weight() * 1.0 / depot.maxCap));
+			int vehicles=0;
+			for (Tour tour : t) {
+			System.out.println("Route unfit " + (tour.length() < depot.maxDist) + (tour.weight() < depot.maxCap));
+			vehicles = Math.max((int) Math.ceil(tour.length() * 1.0 / depot.maxDist),
+					(int) Math.ceil(tour.weight() * 1.0 / depot.maxCap));
+			}
 			ArrayList<ArrayList<Location>> clusters = new KMeans(vehicles, must, depot.location).getClusters();
 			ArrayList<Tour> tours = new ArrayList<>();
 			for (ArrayList<Location> c : clusters) {
@@ -104,6 +133,103 @@ public class Day {
 				System.out.print("\n");
 			}
 		}
+	}
+	
+	
+	
+	
+	
+	
+	void scheduleMays(int[][] distances){
+		
+		
+		
+		if(!may.isEmpty()){
+			System.out.println("START MAYS-SCHEDULE");
+		System.out.print(" MUST LIST: ");
+		for(int i=0 ; i<must.size(); i++){
+			System.out.print(must.get(i).r.locationId+" ");
+		}
+		System.out.print("\n");
+		System.out.print(" MAY LIST: ");
+		for(int i=0 ; i<may.size(); i++){
+			System.out.print(may.get(i).r.locationId+" ");
+		}
+		System.out.print("\n");
+		
+		may.add(depot.location);
+		Tour t = cheapestInsertion(convexHullFinder(may), may, distances).cycle(depot.location);
+
+		if (t.length() < depot.maxDist && t.weight() < depot.maxCap) {
+			Vehicle v = depot.getVehicle();
+			v.addTour(t);
+			all.add(depot.location);
+			new Scatterplot(all, t, dayId);
+			all.remove(depot.location);
+			
+			System.out.print("Delivering: ");
+			for (Edge e : t.tour) {
+				if (!e.end.isDepot) {
+					System.out.print(e.end.id + " ");
+					e.end.r.deliver();
+				}
+			}
+			System.out.print("\n");
+		} else {
+			System.out.println("Route unfit " + (t.length() < depot.maxDist) + (t.weight() < depot.maxCap));
+			int vehicles = Math.max((int) Math.ceil(t.length() * 1.0 / depot.maxDist),
+					(int) Math.ceil(t.weight() * 1.0 / depot.maxCap));
+			ArrayList<ArrayList<Location>> clusters = new KMeans(vehicles, may, depot.location).getClusters();
+			ArrayList<Tour> tours = new ArrayList<>();
+			for (ArrayList<Location> c : clusters) {
+				if (c.size() == 1) {
+					System.out.println("HERE! OVER HERE!");
+				}
+				c.add(depot.location);
+				tours.add(cheapestInsertion(convexHullFinder(c), c, distances).cycle(depot.location));
+			}
+			
+			while(!validateAll(tours, depot.maxCap, depot.maxDist)) {
+				vehicles = 0;
+				for (Tour tour : tours) {
+					System.out.println("Subroute unfit length: " + (tour.length() < depot.maxDist) + " weight: " + (tour.weight() < depot.maxCap));
+					vehicles += Math.max((int) Math.ceil(tour.length() * 1.0 / depot.maxDist),
+							(int) Math.ceil(tour.weight() * 1.0 / depot.maxCap));
+				}
+				System.out.println("Try with " + vehicles + " vehicles");
+				clusters = new KMeans(vehicles, may, depot.location).getClusters();
+				tours = new ArrayList<>();
+				for (ArrayList<Location> c : clusters) {
+					c.add(depot.location);
+					tours.add(cheapestInsertion(convexHullFinder(c), c, distances).cycle(depot.location));
+				}
+			}
+			
+			all.add(depot.location);
+			new Scatterplot(all, tours, dayId);
+			all.remove(depot.location);
+			
+			for (Tour tour : tours) {
+				Vehicle v = depot.getVehicle();
+				v.addTour(tour);
+				
+				System.out.print("Delivering: ");
+				for (Edge e : tour.tour) {
+					if (!e.end.isDepot) {
+						System.out.print(e.end.id + " ");
+						e.end.r.deliver();
+					}
+				}
+				
+			}
+		}
+		System.out.println("END MAYS SCHEDULE");
+		} else {
+			System.out.println("NO MAYS LEFT TO SCHEDULE");
+		}
+		
+		
+		
 	}
 
 	Tour cheapestInsertion(Stack convexHull, ArrayList<Location> locations, int[][] distances) {

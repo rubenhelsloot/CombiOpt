@@ -77,6 +77,17 @@ public class Location implements Comparable, Cloneable {
 		return false;
 	}
 
+	boolean classifyMay(int day) {
+		 if (!r.delivered && day >= r.first) {
+			return true;
+		}
+
+		return false;
+	}
+
+	
+	
+	
 	void print() {
 		System.out.println("(" + x + ", " + y + ") " + angle);
 	}
