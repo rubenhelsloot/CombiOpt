@@ -1,0 +1,63 @@
+DATASET = Randomly generated instance set (zv8z1ugzkzkz34z34z1zaz1zkz1z34zazaz1z7z0zv8z1zaz0zuz1zaz0zv8zyzyzyzyzyzwz)
+NAME = Randomly generated instance (2523)
+
+DAY = 3
+NUMBER_OF_VEHICLES = 1
+1 R 0 11 0
+
+DAY = 4
+NUMBER_OF_VEHICLES = 2
+1 R 0 12 14 0
+2 R 0 8 2 0
+
+DAY = 5
+NUMBER_OF_VEHICLES = 2
+1 R 0 20 15 0
+2 R 0 3 13 0
+
+DAY = 6
+NUMBER_OF_VEHICLES = 5
+1 R 0 1 0
+2 R 0 19 0
+3 R 0 17 0
+4 R 0 10 0
+5 R 0 4 0
+
+DAY = 7
+NUMBER_OF_VEHICLES = 7
+1 R 0 -10 0
+2 R 0 -4 0
+3 R 0 9 0
+4 R 0 -8 0
+5 R 0 5 0
+6 R 0 -15 0
+7 R 0 -17 0
+
+DAY = 8
+NUMBER_OF_VEHICLES = 3
+1 R 0 6 0
+2 R 0 -9 0
+3 R 0 18 0
+
+DAY = 9
+NUMBER_OF_VEHICLES = 8
+1 R 0 7 0
+2 R 0 -13 0
+3 R 0 -1 0
+4 R 0 -5 0
+5 R 0 -19 0
+6 R 0 -6 0
+7 R 0 16 0
+8 R 0 -3 0
+
+DAY = 10
+NUMBER_OF_VEHICLES = 8
+1 R 0 -7 0
+2 R 0 -11 0
+3 R 0 -18 0
+4 R 0 -14 0
+5 R 0 -2 0
+6 R 0 -12 0
+7 R 0 -20 0
+8 R 0 -16 0
+

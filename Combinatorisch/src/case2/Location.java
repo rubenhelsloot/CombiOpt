@@ -48,9 +48,13 @@ public class Location implements Comparable, Cloneable {
 	}
 
 	void endOfDay() {
+		reset();
+		r.endOfDay();
+	}
+	
+	void reset() {
 		visited = false;
 		cluster = 0;
-		r.endOfDay();
 	}
 
 	void visit() {

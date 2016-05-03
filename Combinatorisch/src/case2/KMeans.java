@@ -10,9 +10,9 @@ public class KMeans {
 	ArrayList<Cluster> clusters;
 
 	KMeans(int k, ArrayList<Location> l, Location depot) {
-		this.k = k;
 		points = l;
 		points.remove(depot);
+		this.k = Math.min(k, points.size());
 		clusters = new ArrayList<>(k);
 
 		init();
@@ -20,10 +20,6 @@ public class KMeans {
 	}
 
 	void init() {
-		System.out.print("Starting " + k + "-means with ");
-		for(Location l : points) 
-			System.out.print(l.id + " ");
-		System.out.print("\n");
 		
 		int[] values = uniqueRandomValues();
 		for (int i = 0; i < k; i++) {
@@ -33,7 +29,7 @@ public class KMeans {
 			clusters.add(cluster);
 		}
 
-		print(); // Debug
+//		print(); // Debug
 	}
 
 	void calculate() {
@@ -53,9 +49,9 @@ public class KMeans {
 			for (int i = 0; i < oldCentroids.size(); i++) {
 				distance += oldCentroids.get(i).distance(newCentroids.get(i));
 			}
-			System.out.println("Iteration: " + iteration);
-			System.out.println("Centroid distances: " + distance);
-			print();
+//			System.out.println("Iteration: " + iteration);
+//			System.out.println("Centroid distances: " + distance);
+//			print();
 
 			if (distance == 0) {
 				finish = true;

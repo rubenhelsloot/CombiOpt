@@ -41,10 +41,10 @@ public class Vehicle {
 
 		int loaded = 0;
 		int i = 0;
-		while (i < depot.toolstack.size() && (loaded < l.r.amount)) {
+		while (loaded < l.r.amount) {
 			if (l.r.type == depot.toolstack.get(i).type) {
-				load.add(depot.toolstack.remove(i));
 				weight += depot.toolstack.get(i).size;
+				load.add(depot.toolstack.remove(i));
 				loaded++;
 				// System.out.println("Loading: " + loaded + " out of " +
 				// l.r.amount);
@@ -65,7 +65,6 @@ public class Vehicle {
 	}
 
 	void unload(Location l) {
-//		System.out.println("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
 		if (l.isDepot) {
 			while (load.size() > 0) {
 				Tool t = load.remove(0);
@@ -80,8 +79,6 @@ public class Vehicle {
 					l.r.stack[unloaded] = load.remove(i);
 					weight += l.r.stack[unloaded].size;
 					unloaded++;
-					// System.out.println("Unloaded: " + unloaded + " out of " +
-					// l.r.amount);
 				} else {
 					i++;
 				}
@@ -91,8 +88,7 @@ public class Vehicle {
 
 	void addTour(Tour t) {
 		this.t = t;
-
-		for (int i = 0; i < t.tour.size() - 1; i++) {
+		for (int i = 0; i < t.tour.size(); i++) {
 			if (t.tour.get(i).start.isDepot) {
 				int j = i;
 
@@ -104,8 +100,8 @@ public class Vehicle {
 					j++;
 				}
 			}
-
-			if (t.tour.get(i).end.id == depot.location.id) {
+			
+			if (t.tour.get(i).end.isDepot) {
 				unload(t.tour.get(i).end);
 			} else if (t.tour.get(i).end.r.delivered) {
 				load(t.tour.get(i).end);
@@ -113,6 +109,6 @@ public class Vehicle {
 				unload(t.tour.get(i).end);
 			}
 		}
-		System.out.print("Weight: " + weight + ", length: " + t.length() + "\n");
+//		System.out.print("Weight: " + weight + ", length: " + t.length() + "\n");
 	}
 }

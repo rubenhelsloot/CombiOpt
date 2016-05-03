@@ -11,6 +11,13 @@ public class Tour {
 	Tour() {
 		tour = new ArrayList<>();
 	}
+	
+	Tour(Tour t) {
+		tour = new ArrayList<>();
+		for (Edge e : t.tour) {
+			tour.add(new Edge(e));
+		}
+	}
 
 	Tour cycle(Location l) {
 		int max = tour.size();
@@ -80,6 +87,15 @@ public class Tour {
 
 		return result;
 	}
+	
+	Tour merge(Tour other) {
+		other.tour.remove(0);
+		this.tour.remove(other.size() - 1);
+		for (Edge e : other.tour) {
+			this.tour.add(e);
+		}
+		return this;
+	}
 
 	void print() {
 		System.out.print("Tour: ");
@@ -98,7 +114,7 @@ public class Tour {
 		return false;
 	}
 	
-	boolean validate(int maxCap, int maxDist) {
-		return (length() < maxDist && weight() < maxCap);
+	boolean validate(Depot depot) {
+		return (length() < depot.maxDist && weight() < depot.maxCap);
 	}
 }

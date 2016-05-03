@@ -182,7 +182,7 @@ public class Main {
 
 	void schedule() {
 		for (int i = 0; i < days; i++) {
-			System.out.println("Day " + (i + 1));
+//			System.out.println("Day " + (i + 1));
 			horizon[i].init(locationList);
 			horizon[i].scheduleMusts(distance);
 
