@@ -243,7 +243,7 @@ public class Main {
 							e.end.r.printOutput();
 							write += e.end.r.id + " ";
 						} else {
-							write += depotCoordinate;
+							write += depotCoordinate + " ";
 						}
 					}
 					i++;

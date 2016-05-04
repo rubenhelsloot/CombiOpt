@@ -8,6 +8,7 @@ public class Depot {
 	int maxDist;
 	ArrayList<Tool> toolstack;
 	ArrayList<Vehicle> carpark;
+	int numVehicle = 0;
 
 	Depot(int id, int x, int y, int[][] tools, int maxCap, int maxDist) {
 		location = new Location(id, x, y);
@@ -36,8 +37,11 @@ public class Depot {
 	}
 
 	Vehicle getVehicle() {
-		if (carpark.size() == 0)
-			carpark.add(new Vehicle(maxCap, maxDist, this));
+		if (carpark.size() == 0) {
+			carpark.add(new Vehicle(numVehicle, maxCap, maxDist, this));
+			numVehicle++;
+		}
+			
 		return carpark.remove(0);
 	}
 }

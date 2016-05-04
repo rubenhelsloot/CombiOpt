@@ -13,6 +13,7 @@ public class Day {
 	public int dayId;
 	private Depot depot;
 	boolean debug;
+	int[][] distances;
 
 	Day(int dayId, Depot depot) {
 		this.depot = depot;
@@ -30,9 +31,9 @@ public class Day {
 //			if (l.r.delivered)
 //				System.out.print("-" + l.r.remaining);
 //			System.out.print(" ");
-			if (l.classifyRequest(dayId)) {
+			if (l.classifyMusts(dayId)) {
 				must.add(l);
-			} else {
+			} else if (l.classifyMays(dayId)) {
 				may.add(l);
 			}
 		}
@@ -40,6 +41,7 @@ public class Day {
 	}
 
 	void scheduleMusts(int[][] distances) {
+		this.distances = distances;
 		int vehicles = 1;
 		boolean success = false;
 
@@ -60,6 +62,10 @@ public class Day {
 
 			if (validateAll(tours, depot)) {
 				success = true;
+			} else if (validate(tours, depot)) {
+				init(all);
+				scheduleMusts(distances);
+				return;
 			} else {
 				int previousVehicles = vehicles;
 				vehicles = 0;
@@ -77,11 +83,34 @@ public class Day {
 			}
 		}
 
-		// tours = mergeTours(tours);
+		tours = mergeTours(tours);
 
-		// all.add(depot.location);
-		// new Scatterplot(all, tours, dayId);
-		// all.remove(depot.location);
+		for (Location l : may) {
+			boolean added = false;
+			ArrayList<Location> al = new ArrayList<>();
+			ArrayList<Tour> toursClone = new ArrayList<>();
+			al.add(l);
+			for (Tour t : tours) {
+				toursClone.add(new Tour(t));
+			}
+			int i = 0;
+			while (i < toursClone.size() && !added) {
+				Tour tClone = toursClone.get(i);
+				tClone = cheapestInsertion(tClone, al, distances).cycle(depot.location);
+
+				if (validateAll(toursClone, depot)) {
+					added = true;
+					tours.set(i, tClone);
+				} else {
+					toursClone.set(i, tours.get(i));
+					i++;
+				}
+			}
+		}
+
+//		all.add(depot.location);
+//		new Scatterplot(all, tours, dayId);
+//		all.remove(depot.location);
 
 		for (Tour tour : tours) {
 			Vehicle v = depot.getVehicle();
@@ -99,18 +128,35 @@ public class Day {
 	}
 
 	ArrayList<Tour> mergeTours(ArrayList<Tour> tours) {
+//		int i = 0;
+//		while (i < tours.size()) {
+//			Tour t = new Tour(tours.get(i));
+//			for (int j = i; j < tours.size(); j++) {
+//				t.merge(new Tour(tours.get(j)));
+//				if (t.validate(depot)) {
+//					tours.set(i, t);
+//					tours.remove(j);
+//				}
+//			}
+//			i++;
+//		}
+//		return tours;
+		
 		int i = 0;
 		while (i < tours.size()) {
-			Tour t = new Tour(tours.get(i));
-			for (int j = i; j < tours.size(); j++) {
-				t.merge(new Tour(tours.get(j)));
-				if (t.validate(depot)) {
-					tours.set(i, t);
+			for (int j = i + 1; j < tours.size(); j++) {
+				Tour tClone = new Tour(tours.get(i));
+				tClone.add(new Tour(tours.get(j)));
+				if (tClone.validate(depot)) {
+					tours.set(i, tClone);
 					tours.remove(j);
+				} else {
+					tClone = new Tour(tours.get(i));
 				}
 			}
 			i++;
 		}
+		
 		return tours;
 	}
 
@@ -168,6 +214,40 @@ public class Day {
 		}
 //		tour.print();
 //		System.out.println("Cheapest insertion length: " + tour.length());
+
+		return tour;
+	}
+
+	Tour cheapestInsertion(Tour tour, ArrayList<Location> locations, int[][] distances) {
+		int i = 0;
+		while (i <= locations.size()) {
+			Edge e = tour.tour.get(0);
+			int replace = 0;
+			int a = 0;
+
+			Location l = locations.get(a);
+			double dist = insertionGain(distances, e, depot.location.id);
+
+			for (int j = a + 1; j < locations.size(); j++) {
+				if (!locations.get(j).visited) {
+					for (int k = 0; k < i; k++) {
+						if (insertionGain(distances, tour.tour.get(k), locations.get(j).id) < dist) {
+							dist = insertionGain(distances, tour.tour.get(k), locations.get(j).id);
+							e = tour.tour.get(k);
+							l = locations.get(j);
+							replace = k;
+						}
+					}
+				}
+			}
+
+			tour.tour.set(replace, new Edge(e.start, l));
+			tour.tour.add(replace + 1, new Edge(l, e.end));
+			l.visit();
+			i++;
+		}
+
+		tour.removeDuplicates();
 
 		return tour;
 	}
@@ -257,18 +337,22 @@ public class Day {
 			for (Edge e : t.tour) {
 				if (!e.end.isDepot && !e.end.r.delivered) {
 					tools.put(e.end.r.type, tools.getOrDefault(e.end.r.type, 0) + e.end.r.amount);
-					max.put(e.end.r.type, Math.max(tools.getOrDefault(e.end.r.type, 0),
-							max.getOrDefault(e.end.r.type, 0)));
+					max.put(e.end.r.type,
+							Math.max(tools.getOrDefault(e.end.r.type, 0), max.getOrDefault(e.end.r.type, 0)));
 				} else if (!e.end.isDepot && e.end.r.delivered) {
 					tools.put(e.end.r.type, tools.getOrDefault(e.end.r.type, 0) - e.end.r.amount);
 				}
 			}
 		}
-		for (int key : max.keySet()) {
-			if (max.get(key) > depot.toolsByType(key))
+
+		return true;
+	}
+
+	boolean validate(ArrayList<Tour> tours, Depot depot) {
+		for (Tour t : tours) {
+			if (!t.validate(depot))
 				return false;
 		}
-
 		return true;
 	}
 

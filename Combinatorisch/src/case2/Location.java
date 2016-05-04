@@ -13,7 +13,7 @@ public class Location implements Comparable, Cloneable {
 	Location(Request r, int[][] coordinates, int dx, int dy) {
 		id = r.locationId;
 		x = coordinates[id][1];
-		y = coordinates[id][y];
+		y = coordinates[id][2];
 		angle = Math.atan2(y - dy, x - dx);
 		isDepot = (x == dy && y == dy && angle == 0);
 		this.r = r;
@@ -24,7 +24,7 @@ public class Location implements Comparable, Cloneable {
 	Location(Request r, int[][] coordinates, Location d) {
 		id = r.locationId;
 		x = coordinates[id][1];
-		y = coordinates[id][y];
+		y = coordinates[id][2];
 		angle = Math.atan2(y - d.y, x - d.x);
 		isDepot = (x == d.y && y == d.y && angle == 0);
 		this.r = r;
@@ -71,14 +71,12 @@ public class Location implements Comparable, Cloneable {
 		return (int) Math.floor(Math.sqrt(dx + dy));
 	}
 	
-	boolean classifyRequest(int day) {
-		if ((r.delivered && r.remaining == 0) || (!r.delivered && r.last == day)) {
-			return true;
-		} else if (!r.delivered && day >= r.first) {
-			return false;
-		}
-
-		return false;
+	boolean classifyMusts(int day) {
+		return ((r.delivered && r.remaining == 0) || (!r.delivered && r.last == day));
+	}
+	
+	boolean classifyMays(int day) {
+		return (!r.delivered && day >= r.first);
 	}
 
 	void print() {

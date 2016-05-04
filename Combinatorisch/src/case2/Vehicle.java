@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Vehicle {
 
+	int id;
 	int maxCap;
 	int weight;
 	int maxDist;
@@ -13,7 +14,8 @@ public class Vehicle {
 	Tour t;
 	Depot depot;
 
-	Vehicle(int maxCap, int maxDist, Depot depot) {
+	Vehicle(int id, int maxCap, int maxDist, Depot depot) {
+		this.id = id;
 		this.maxCap = maxCap;
 		this.maxDist = maxDist;
 		this.depot = depot;
@@ -46,8 +48,7 @@ public class Vehicle {
 				weight += depot.toolstack.get(i).size;
 				load.add(depot.toolstack.remove(i));
 				loaded++;
-				// System.out.println("Loading: " + loaded + " out of " +
-				// l.r.amount);
+//				 System.out.println("Loading: " + loaded + " out of " +l.r.amount);
 			} else {
 				i++;
 			}
@@ -55,7 +56,7 @@ public class Vehicle {
 	}
 
 	void load(Location l) {
-//		System.out.println("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
+//		System.out.println("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount + " from " + id + " (" + t.size() + ")");
 		for (int i = 0; i < l.r.amount; i++) {
 			load.add(l.r.stack[i]);
 			weight += l.r.stack[i].size;
@@ -66,12 +67,14 @@ public class Vehicle {
 
 	void unload(Location l) {
 		if (l.isDepot) {
+//			System.out.println("Unloading: @D " + load.size());
 			while (load.size() > 0) {
 				Tool t = load.remove(0);
 				depot.toolstack.add(t);
 				weight -= t.size;
 			}
 		} else {
+//			System.out.println("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
 			int unloaded = 0;
 			int i = 0;
 			while (unloaded < l.r.amount) {

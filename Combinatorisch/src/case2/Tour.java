@@ -2,6 +2,7 @@ package case2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,12 +27,23 @@ public class Tour {
 		while (tour.get(0).start.id != l.id && i < max) {
 			Edge e = tour.get(0);
 			tour.add(e);
-			System.out.println(tour.get(0).start.id + " - " + tour.get(0).end.id);
 			tour.remove(0);
 
 			i++;
 		}
 
+		return this;
+	}
+	
+	Tour removeDuplicates() {
+		Iterator<Edge> itr = tour.iterator();
+		
+		while(itr.hasNext()) {
+			Edge e = itr.next();
+			if (e.end.id == e.start.id && e.end.r.id == e.start.r.id)
+				itr.remove();
+		}
+		
 		return this;
 	}
 
@@ -93,6 +105,13 @@ public class Tour {
 		this.tour.remove(other.size() - 1);
 		for (Edge e : other.tour) {
 			this.tour.add(e);
+		}
+		return this;
+	}
+	
+	Tour add(Tour other) {
+		for (Edge e : other.tour) {
+			tour.add(e);
 		}
 		return this;
 	}
