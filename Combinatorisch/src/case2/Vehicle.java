@@ -1,5 +1,6 @@
 package case2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Vehicle {
@@ -37,9 +38,11 @@ public class Vehicle {
 		return result;
 	}
 
-	void loadFromDepot(Location l) {
-		if (depot.toolsByType(l.r.type) < l.r.amount)
-			return;
+	void loadFromDepot(Location l) throws Exception {
+		if (depot.toolsByType(l.r.type) < l.r.amount) {
+			int stack = depot.toolsByType(l.r.type);
+			throw new Exception();
+		}
 
 		int loaded = 0;
 		int i = 0;
@@ -48,15 +51,22 @@ public class Vehicle {
 				weight += depot.toolstack.get(i).size;
 				load.add(depot.toolstack.remove(i));
 				loaded++;
-//				 System.out.println("Loading: " + loaded + " out of " +l.r.amount);
+				// System.out.println("Loading: " + loaded + " out of "
+				// +l.r.amount + " from " + id + " (" + t.size() + ")");
 			} else {
 				i++;
 			}
 		}
+
 	}
 
 	void load(Location l) {
-//		System.out.println("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount + " from " + id + " (" + t.size() + ")");
+//		try {
+//			depot.bf.write("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount + " from " + id + " (" + t.size() + ")");
+//			depot.bf.newLine();
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
 		for (int i = 0; i < l.r.amount; i++) {
 			load.add(l.r.stack[i]);
 			weight += l.r.stack[i].size;
@@ -67,24 +77,44 @@ public class Vehicle {
 
 	void unload(Location l) {
 		if (l.isDepot) {
-//			System.out.println("Unloading: @D " + load.size());
+//			try {
+//				depot.bf.write("Unloading: @D " + load.size());
+//				depot.bf.newLine();
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
 			while (load.size() > 0) {
 				Tool t = load.remove(0);
 				depot.toolstack.add(t);
 				weight -= t.size;
 			}
 		} else {
-//			System.out.println("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
+//			try {
+//				depot.bf.write("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
+//				depot.bf.newLine();
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
 			int unloaded = 0;
 			int i = 0;
-			while (unloaded < l.r.amount) {
-				if (l.r.type == load.get(i).type) {
-					l.r.stack[unloaded] = load.remove(i);
-					weight += l.r.stack[unloaded].size;
-					unloaded++;
-				} else {
-					i++;
-				}
+			try {
+				do {
+					if (load == null)
+						throw new Exception();
+					if (load.get(i) == null) {
+						i++;
+						continue;
+					}
+					if (l.r.type == load.get(i).type) {
+						l.r.stack[unloaded] = load.remove(i);
+						weight += l.r.stack[unloaded].size;
+						unloaded++;
+					} else {
+						i++;
+					}
+				} while (unloaded < l.r.amount);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -97,13 +127,17 @@ public class Vehicle {
 
 				while (!t.tour.get(j).end.isDepot) {
 					if (!t.tour.get(j).end.r.delivered) {
-						loadFromDepot(t.tour.get(j).end);
+						try {
+							loadFromDepot(t.tour.get(j).end);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 
 					j++;
 				}
 			}
-			
+
 			if (t.tour.get(i).end.isDepot) {
 				unload(t.tour.get(i).end);
 			} else if (t.tour.get(i).end.r.delivered) {
@@ -112,6 +146,11 @@ public class Vehicle {
 				unload(t.tour.get(i).end);
 			}
 		}
-//		System.out.print("Weight: " + weight + ", length: " + t.length() + "\n");
+//		try {
+//			depot.bf.write("Weight: " + weight + ", length: " + t.length() + "\n");
+//			depot.bf.newLine();
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
 	}
 }

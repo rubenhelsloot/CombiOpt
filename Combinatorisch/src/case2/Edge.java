@@ -17,7 +17,11 @@ public class Edge {
         length = e.length;
     }
     
-    void print() {
-    	System.out.print("(" + start.id + ", " + end.id + ") ");
+    String print() {
+    	String line = "(" + start.id;
+    	line += !start.isDepot ? " [" + start.r.id + "], " : ", ";
+    	line += end.id;
+    	line += !end.isDepot ? " [" + end.r.id + "]) " : ") ";
+    	return line;
     }
 }

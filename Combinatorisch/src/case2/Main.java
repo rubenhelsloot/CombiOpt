@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -15,10 +16,14 @@ import java.util.Scanner;
 public class Main {
 
 	BufferedWriter bw;
+	BufferedWriter debug;
 	BufferedReader br;
-	int days, capacity, maxTripDistance, depotCoordinate, vehicleCost, vehicleDayCost, distanceCost;
-	int[][] tools, coordinates, requests, distance;
-	Map<String, Integer> map;
+	int days, capacity, maxTripDistance, depotCoordinate;
+	long vehicleCost, vehicleDayCost, distanceCost;
+	long[][] tools;
+	int[][] coordinates, requests, distance;
+	Map<String, Integer> intMap;
+	Map<String, Long> longMap;
 	Map<String, int[][]> arrayMap;
 	PrintStream out;
 
@@ -27,7 +32,8 @@ public class Main {
 	ArrayList<Location> locationList;
 
 	Main() {
-		map = new HashMap<>();
+		intMap = new HashMap<>();
+		longMap = new HashMap<>();
 		arrayMap = new HashMap<>();
 		out = new PrintStream(System.out);
 		locationList = new ArrayList<>();
@@ -35,10 +41,17 @@ public class Main {
 
 	void printArray(int[][] array) {
 		for (int i = 0; i < array.length; i++) {
+			String line = "";
 			for (int j = 0; j < array[0].length; j++) {
-				out.printf(array[i][j] + "\t");
+				line += array[i][j] + "\t";
 			}
-			out.printf("\n");
+//			try {
+//				debug.write(line);
+//				debug.newLine();
+//			} catch (IOException e) {
+//				 TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
 	}
 
@@ -70,31 +83,42 @@ public class Main {
 
 		readVariables(al);
 
-		days = map.get("DAYS");
-		capacity = map.get("CAPACITY");
-		maxTripDistance = map.get("MAX_TRIP_DISTANCE");
-		depotCoordinate = map.get("DEPOT_COORDINATE");
-		vehicleCost = map.get("VEHICLE_COST");
-		vehicleDayCost = map.get("VEHICLE_DAY_COST");
-		distanceCost = map.get("DISTANCE_COST");
-		tools = arrayMap.get("TOOLS");
+		days = intMap.get("DAYS");
+		capacity = intMap.get("CAPACITY");
+		maxTripDistance = intMap.get("MAX_TRIP_DISTANCE");
+		depotCoordinate = intMap.get("DEPOT_COORDINATE");
+		vehicleCost = longMap.get("VEHICLE_COST");
+		vehicleDayCost = longMap.get("VEHICLE_DAY_COST");
+		distanceCost = longMap.get("DISTANCE_COST");
 		coordinates = arrayMap.get("COORDINATES");
 		requests = arrayMap.get("REQUESTS");
 		distance = arrayMap.get("DISTANCE");
 	}
 
 	void readVariables(ArrayList<String> al) {
+		while (al.get(0).charAt(0) != 'V') {
+			Scanner s = new Scanner(al.get(0));
+			s.useDelimiter(" ");
+			String varName = s.next();
+			s.next();
+			intMap.put(varName, s.nextInt());
+			al.remove(0);
+			s.close();
+		}
+
 		while (al.get(0).charAt(0) != 'T') {
 			Scanner s = new Scanner(al.get(0));
 			s.useDelimiter(" ");
 			String varName = s.next();
 			s.next();
-			map.put(varName, s.nextInt());
+			longMap.put(varName, s.nextLong());
 			al.remove(0);
 			s.close();
 		}
 
-		al = readArray(readArray(readArray(al)));
+		al = readTools(al);
+
+		al = readArray(readArray(al));
 
 		if (al.size() > 0 && al.get(0).equals("DISTANCE")) {
 			al.remove(0);
@@ -113,7 +137,7 @@ public class Main {
 		String varName = s.next();
 		s.next();
 		int height = s.nextInt();
-		int width = varName.equals("TOOLS") ? 4 : varName.equals("COORDINATES") ? 3 : 7;
+		int width = varName.equals("COORDINATES") ? 3 : 7;
 		int[][] array = new int[height][width];
 		s.close();
 
@@ -128,6 +152,31 @@ public class Main {
 			line.close();
 		}
 		arrayMap.put(varName, array);
+		return al;
+	}
+
+	ArrayList<String> readTools(ArrayList<String> al) {
+		String str = al.get(0);
+		al.remove(0);
+		Scanner s = new Scanner(str);
+		s.useDelimiter(" ");
+
+		s.next();
+		s.next();
+		int height = s.nextInt();
+		tools = new long[height][4];
+		s.close();
+
+		for (int i = 0; i < height; i++) {
+			Scanner line = new Scanner(al.get(0));
+			line.useDelimiter("\t");
+			al.remove(0);
+
+			for (int j = 0; j < 4; j++) {
+				tools[i][j] = line.nextLong();
+			}
+			line.close();
+		}
 		return al;
 	}
 
@@ -182,7 +231,12 @@ public class Main {
 
 	void schedule() {
 		for (int i = 0; i < days; i++) {
-//			System.out.println("Day " + (i + 1));
+//			try {
+//				debug.write("Day " + (i + 1));
+//				debug.newLine();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 			horizon[i].init(locationList);
 			horizon[i].scheduleMusts(distance);
 
@@ -198,21 +252,21 @@ public class Main {
 			}
 		}
 	}
-	
+
 	void writeOutput() {
 		try {
-//			writeSummary();
+			// writeSummary();
 			writeDay();
 			bw.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	void writeSummary() throws Exception {
 		int maxVehicles = 0;
 		int noVehicleDays = 0;
-//		int[] toolUse = new int[horizon.length];
+		// int[] toolUse = new int[horizon.length];
 		int distance = 0;
 		int cost = 0;
 		for (Day d : horizon) {
@@ -225,7 +279,7 @@ public class Main {
 		}
 		cost += vehicleCost * maxVehicles;
 	}
-	
+
 	void writeDay() throws Exception {
 		for (Day d : horizon) {
 			if (d.tours.size() > 0) {
@@ -260,14 +314,21 @@ public class Main {
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
 			bw = new BufferedWriter(new FileWriter(output));
+//			debug = new BufferedWriter(new FileWriter("Debug/log.txt"));
 			readFile();
 		} catch (Exception e) {
 			e.printStackTrace();
+//			try {
+//				debug.write(e.getMessage());
+//				debug.newLine();
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
 		}
 
 		setup();
 		schedule();
-		
+
 		writeOutput();
 	}
 

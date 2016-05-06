@@ -1,5 +1,8 @@
 package case2;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 public class Location implements Comparable, Cloneable {
 	int id;
 	int x;
@@ -79,8 +82,14 @@ public class Location implements Comparable, Cloneable {
 		return (!r.delivered && day >= r.first);
 	}
 
-	void print() {
-		System.out.println("(" + x + ", " + y + ") " + angle);
+	void print(BufferedWriter bf) {
+		String line = "(" + x + ", " + y + ") " + angle;
+		try {
+			bf.write(line);
+			bf.newLine();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public int compareTo(Object other) {

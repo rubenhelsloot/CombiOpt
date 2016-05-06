@@ -1,5 +1,8 @@
 package case2;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,6 +26,11 @@ public class Tour {
 	Tour cycle(Location l) {
 		int max = tour.size();
 		int i = 0;
+		
+		if (max == 0) {
+			System.out.println("NULL!");
+			return null;
+		}
 
 		while (tour.get(0).start.id != l.id && i < max) {
 			Edge e = tour.get(0);
@@ -40,8 +48,13 @@ public class Tour {
 		
 		while(itr.hasNext()) {
 			Edge e = itr.next();
-			if (e.end.id == e.start.id && e.end.r.id == e.start.r.id)
+			if (e.end.id == e.start.id && (e.end.isDepot || e.end.r.id == e.start.r.id)){
 				itr.remove();
+			}
+		}
+		
+		if (tour.size() < 2) {
+			return null;
 		}
 		
 		return this;
@@ -60,11 +73,11 @@ public class Tour {
 	}
 
 	// Maximum weight in vehicle during tour
-	int weight() {
-		Map<Integer, Integer> weights = new HashMap<>();
-		Map<Integer, Integer> max = new HashMap<>();
-		Map<Integer, Integer> min = new HashMap<>();
-		Map<Integer, Integer> inVehicle = new HashMap<>();
+	long weight() {
+		Map<Integer, Long> weights = new HashMap<>();
+		Map<Integer, Long> max = new HashMap<>();
+		Map<Integer, Long> min = new HashMap<>();
+		Map<Integer, Long> inVehicle = new HashMap<>();
 
 		for (int i = 0; i < tour.size() - 1; i++) {
 			Edge e = tour.get(i);
@@ -81,20 +94,20 @@ public class Tour {
 			if (e.end.isDepot) {
 				inVehicle.clear();
 			} else if (e.end.r.delivered) {
-				int current = inVehicle.getOrDefault(e.end.r.type, 0) + e.end.r.amount;
+				long current = inVehicle.getOrDefault(e.end.r.type, 0L) + e.end.r.amount;
 				inVehicle.put(e.end.r.type, current);
-				max.put(e.end.r.type, Math.max(current, max.getOrDefault(e.end.r.type, 0)));
+				max.put(e.end.r.type, Math.max(current, max.getOrDefault(e.end.r.type, 0L)));
 			} else {
-				int current = inVehicle.getOrDefault(e.end.r.type, 0) - e.end.r.amount;
+				long current = inVehicle.getOrDefault(e.end.r.type, 0L) - e.end.r.amount;
 				inVehicle.put(e.end.r.type, current);
-				min.put(e.end.r.type, Math.min(current, min.getOrDefault(e.end.r.type, 0)));
+				min.put(e.end.r.type, Math.min(current, min.getOrDefault(e.end.r.type, 0L)));
 			}
 		}
 
 		Set<Integer> weightSet = weights.keySet();
 		int result = 0;
 		for (int v : weightSet) {
-			result += (max.getOrDefault(v, 0) - min.getOrDefault(v, 0)) * weights.get(v);
+			result += (max.getOrDefault(v, 0L) - min.getOrDefault(v, 0L)) * weights.get(v);
 		}
 
 		return result;
@@ -116,12 +129,27 @@ public class Tour {
 		return this;
 	}
 
-	void print() {
-		System.out.print("Tour: ");
+	void print(BufferedWriter bf) {
+		String line = "Tour: ";
 		for (Edge e : tour) {
-			e.print();
+			line += e.print();
 		}
-		System.out.print("\n");
+		
+		try {
+			bf.write(line);
+			bf.newLine();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	String print() {
+		String line = "Tour: ";
+		for (Edge e : tour) {
+			line += e.print();
+		}
+		
+		return line;
 	}
 
 	boolean contains(Location l) {
