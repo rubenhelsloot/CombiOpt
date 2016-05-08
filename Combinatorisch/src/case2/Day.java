@@ -54,7 +54,6 @@ public class Day {
 
 	void scheduleMusts(int[][] distances) {
 		this.distances = distances;
-		int vehicles = 0;
 		tours = new ArrayList<>();
 
 		for (Location l : must) {
@@ -128,7 +127,7 @@ public class Day {
 		// }
 		// }
 
-		// tours = mergeTours(tours);
+		 tours = mergeTours(tours);
 
 		// for (Location l : may) {
 		// boolean added = false;
