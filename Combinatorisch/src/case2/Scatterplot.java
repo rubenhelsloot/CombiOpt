@@ -41,7 +41,7 @@ public class Scatterplot extends javax.swing.JFrame {
 				g2d.setStroke(new BasicStroke((float) (0.5 * MODIFIER)));
 				g2d.setFont(new Font( "SansSerif", Font.BOLD, 12));
 				
-				for (Edge e : t.tour) {
+				for (Edge e : t) {
 					Line2D ln = new Line2D.Float(MODIFIER * e.start.x, MODIFIER* e.start.y,
 							MODIFIER* e.end.x, MODIFIER * e.end.y);
 					g2d.draw(ln);
@@ -109,7 +109,7 @@ public class Scatterplot extends javax.swing.JFrame {
 				g2d.setFont(new Font( "SansSerif", Font.BOLD, 12));
 				
 				for (Tour t : tours) {
-					for (Edge e : t.tour) {
+					for (Edge e : t) {
 						Line2D ln = new Line2D.Float(MODIFIER * e.start.x, MODIFIER* e.start.y,
 								MODIFIER* e.end.x, MODIFIER * e.end.y);
 						g2d.draw(ln);
@@ -151,7 +151,7 @@ public class Scatterplot extends javax.swing.JFrame {
 		xmax *= MODIFIER;
 		ymax *= MODIFIER;
 		
-		setBounds((int) (xmin * 0.8), (int) (ymin*0.8), xmax + xmin, (int) ((ymax + ymin)*1.3));
+		setBounds((int) (xmin * 0.8), (int) (ymin*0.8 - 100), (int)((xmax + xmin) * 1.1), (int) ((ymax + ymin)*1.3));
 		setVisible(true);
 	}
 

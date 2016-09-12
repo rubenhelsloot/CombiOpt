@@ -45,13 +45,12 @@ public class Main {
 			for (int j = 0; j < array[0].length; j++) {
 				line += array[i][j] + "\t";
 			}
-//			try {
-//				debug.write(line);
-//				debug.newLine();
-//			} catch (IOException e) {
-//				 TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+			try {
+				debug.write(line);
+				debug.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -219,7 +218,7 @@ public class Main {
 		depot = new Depot(depotCoordinate, coordinates[depotCoordinate][1], coordinates[depotCoordinate][2], tools,
 				capacity, maxTripDistance);
 		for (int i = 0; i < days; i++) {
-			horizon[i] = new Day(i + 1, depot);
+			horizon[i] = new Day(i + 1, depot, vehicleCost, vehicleDayCost, distanceCost);
 		}
 
 		for (int i = 1; i <= requests.length; i++) {
@@ -231,12 +230,13 @@ public class Main {
 
 	void schedule() {
 		for (int i = 0; i < days; i++) {
-//			try {
-//				debug.write("Day " + (i + 1));
-//				debug.newLine();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
+			try {
+				debug.write("Day " + (i + 1));
+				debug.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Day " + (i + 1));
 			horizon[i].init(locationList);
 			horizon[i].scheduleMusts(distance);
 
@@ -291,7 +291,7 @@ public class Main {
 				String write = "";
 				for (Tour t : d.tours) {
 					write += i + " R " + depotCoordinate + " ";
-					for (Edge e : t.tour) {
+					for (Edge e : t) {
 						if (!e.end.isDepot) {
 							write += e.end.r.printed ? "-" : "";
 							e.end.r.printOutput();
@@ -314,16 +314,16 @@ public class Main {
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
 			bw = new BufferedWriter(new FileWriter(output));
-//			debug = new BufferedWriter(new FileWriter("Debug/log.txt"));
+			debug = new BufferedWriter(new FileWriter("Debug/log.txt"));
 			readFile();
 		} catch (Exception e) {
 			e.printStackTrace();
-//			try {
-//				debug.write(e.getMessage());
-//				debug.newLine();
-//			} catch (IOException e1) {
-//				e1.printStackTrace();
-//			}
+			try {
+				debug.write(e.getMessage());
+				debug.newLine();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		setup();

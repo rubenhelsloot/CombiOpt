@@ -38,11 +38,10 @@ public class Vehicle {
 		return result;
 	}
 
-	void loadFromDepot(Location l) throws Exception {
-		if (depot.toolsByType(l.r.type) < l.r.amount) {
-			int stack = depot.toolsByType(l.r.type);
-			throw new Exception();
-		}
+	void loadFromDepot(Location l) {
+		// System.out.println("Loading depot: " + l.r.amount + " out of " +
+		// depot.toolsByType(l.r.type) + " (t" + l.r.type
+		// + ") for R" + l.r.id + " @" + l.id);
 
 		int loaded = 0;
 		int i = 0;
@@ -51,8 +50,9 @@ public class Vehicle {
 				weight += depot.toolstack.get(i).size;
 				load.add(depot.toolstack.remove(i));
 				loaded++;
-				// System.out.println("Loading: " + loaded + " out of "
-				// +l.r.amount + " from " + id + " (" + t.size() + ")");
+				// System.out.println(
+				// "Depotloading: " + loaded + " out of " + l.r.amount + " from
+				// " + id + " (" + t.size() + ")");
 			} else {
 				i++;
 			}
@@ -61,12 +61,16 @@ public class Vehicle {
 	}
 
 	void load(Location l) {
-//		try {
-//			depot.bf.write("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount + " from " + id + " (" + t.size() + ")");
-//			depot.bf.newLine();
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
+		// try {
+		// depot.bf.write("Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount
+		// + " from " + id + " (" + t.size() + ")");
+		// depot.bf.newLine();
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// }
+		// System.out.println(
+		// "Loading: @" + l.id + " R" + l.r.id + " " + l.r.amount + " from " +
+		// id + " (" + t.size() + ")");
 		for (int i = 0; i < l.r.amount; i++) {
 			load.add(l.r.stack[i]);
 			weight += l.r.stack[i].size;
@@ -77,80 +81,77 @@ public class Vehicle {
 
 	void unload(Location l) {
 		if (l.isDepot) {
-//			try {
-//				depot.bf.write("Unloading: @D " + load.size());
-//				depot.bf.newLine();
-//			} catch (IOException e1) {
-//				e1.printStackTrace();
-//			}
+			// try {
+			// depot.bf.write("Unloading: @D " + load.size());
+			// depot.bf.newLine();
+			// } catch (IOException e1) {
+			// e1.printStackTrace();
+			// }
+			// System.out.println("Unloading: @D " + load.size());
 			while (load.size() > 0) {
 				Tool t = load.remove(0);
 				depot.toolstack.add(t);
 				weight -= t.size;
 			}
 		} else {
-//			try {
-//				depot.bf.write("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount);
-//				depot.bf.newLine();
-//			} catch (IOException e1) {
-//				e1.printStackTrace();
-//			}
+			// try {
+			// depot.bf.write("Unloading: @" + l.id + " R" + l.r.id + " " +
+			// l.r.amount);
+			// depot.bf.newLine();
+			// } catch (IOException e1) {
+			// e1.printStackTrace();
+			// }
+			// System.out
+			// .println("Unloading: @" + l.id + " R" + l.r.id + " " + l.r.amount
+			// + " of " + toolsByType(l.r.type));
 			int unloaded = 0;
 			int i = 0;
-			try {
-				do {
-					if (load == null)
-						throw new Exception();
-					if (load.get(i) == null) {
-						i++;
-						continue;
-					}
-					if (l.r.type == load.get(i).type) {
-						l.r.stack[unloaded] = load.remove(i);
-						weight += l.r.stack[unloaded].size;
-						unloaded++;
-					} else {
-						i++;
-					}
-				} while (unloaded < l.r.amount);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			do {
+				if (load.get(i) == null) {
+					i++;
+					continue;
+				}
+				if (l.r.type == load.get(i).type) {
+					l.r.stack[unloaded] = load.remove(i);
+					weight += l.r.stack[unloaded].size;
+					unloaded++;
+				} else {
+					i++;
+				}
+			} while (unloaded < l.r.amount);
 		}
 	}
 
 	void addTour(Tour t) {
-		this.t = t;
-		for (int i = 0; i < t.tour.size(); i++) {
-			if (t.tour.get(i).start.isDepot) {
+		this.t = t.makeValid(depot);
+		// System.out.println("VALID TOUR: " + t.validate(depot));
+		for (int i = 0; i < t.size(); i++) {
+			if (t.get(i).start.isDepot) {
 				int j = i;
 
-				while (!t.tour.get(j).end.isDepot) {
-					if (!t.tour.get(j).end.r.delivered) {
-						try {
-							loadFromDepot(t.tour.get(j).end);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+				while (!t.get(j).end.isDepot) {
+					if (!t.get(j).end.r.delivered) {
+						loadFromDepot(t.get(j).end);
 					}
 
 					j++;
 				}
 			}
 
-			if (t.tour.get(i).end.isDepot) {
-				unload(t.tour.get(i).end);
-			} else if (t.tour.get(i).end.r.delivered) {
-				load(t.tour.get(i).end);
+			if (t.get(i).end.isDepot) {
+				unload(t.get(i).end);
+			} else if (t.get(i).end.r.delivered) {
+				load(t.get(i).end);
 			} else {
-				unload(t.tour.get(i).end);
+				unload(t.get(i).end);
 			}
 		}
-//		try {
-//			depot.bf.write("Weight: " + weight + ", length: " + t.length() + "\n");
-//			depot.bf.newLine();
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
+		// try {
+		// depot.bf.write("Weight: " + weight + ", length: " + t.length() +
+		// "\n");
+		// depot.bf.newLine();
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// }
 	}
 }
